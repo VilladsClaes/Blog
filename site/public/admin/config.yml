@@ -1,0 +1,89 @@
+# Skriv og planlæg indlæg på https://blog.villadsclaes.dk/admin/ – også fra mobilen.
+# Log ind med "Sign in with Token": en GitHub fine-grained token med adgang til
+# VilladsClaes/Blog og rettigheden "Contents: Read and write". Se README.md.
+backend:
+  name: github
+  repo: VilladsClaes/Blog
+  branch: main
+  commit_messages:
+    create: 'Nyt indlæg: {{slug}}'
+    update: 'Opdatér indlæg: {{slug}}'
+    delete: 'Slet indlæg: {{slug}}'
+    uploadMedia: 'Upload {{path}}'
+    deleteMedia: 'Slet {{path}}'
+
+site_url: https://blog.villadsclaes.dk
+display_url: https://blog.villadsclaes.dk
+media_folder: site/public/media/uploads
+public_folder: /media/uploads
+
+collections:
+  - name: posts
+    label: Indlæg
+    label_singular: Indlæg
+    folder: site/src/content/posts
+    extension: md
+    format: frontmatter
+    create: true
+    slug: '{{title}}'
+    summary: '{{title}} · {{publishDate | date("YYYY-MM-DD HH:mm")}}{{draft | ternary(" · KLADDE", "")}}'
+    sortable_fields: [publishDate, title]
+    view_filters:
+      - { label: Kladder, field: draft, pattern: true }
+      - { label: Arkiv, field: archived, pattern: true }
+    preview_path: '{{slug}}/'
+    fields:
+      - { name: title, label: Titel, widget: string }
+      - { name: description, label: Kort beskrivelse, widget: text, required: false }
+      - name: publishDate
+        label: Udgivelsestidspunkt
+        widget: datetime
+        default: '{{now}}'
+        hint: 'Sæt et tidspunkt i fremtiden for at planlægge indlægget. Det udgives automatisk inden for en time efter.'
+      - { name: draft, label: Kladde (ikke synlig), widget: boolean, default: false }
+      - { name: tags, label: Emner, widget: list, required: false, default: [] }
+      - name: sites
+        label: Hører til disse sites
+        widget: select
+        multiple: true
+        required: false
+        default: []
+        options:
+          - { label: villadsclaes.dk, value: villadsclaes }
+          - { label: Mig, value: mig }
+          - { label: LongBets, value: longbets }
+          - { label: Hyponet, value: hyponet }
+          - { label: Læringstræet, value: techtree }
+          - { label: GoodBad, value: goodbad }
+          - { label: Quiz, value: quiz }
+          - { label: Venskabsbutikken, value: venskab }
+          - { label: Foretagsomheden, value: foretagsomheden }
+      - name: links
+        label: Andre links
+        widget: list
+        required: false
+        default: []
+        fields:
+          - { name: title, label: Tekst, widget: string }
+          - { name: url, label: Adresse, widget: string }
+      - { name: video, label: Video øverst (YouTube/Vimeo/mp4-link), widget: string, required: false }
+      - name: interactive
+        label: Interaktive funktioner
+        widget: object
+        collapsed: true
+        required: false
+        fields:
+          - { name: comments, label: Besyv (kommentarer), widget: boolean, default: true }
+          - { name: highlights, label: Understregninger og noter, widget: boolean, default: true }
+          - { name: graffiti, label: Graffiti, widget: boolean, default: true }
+          - { name: readAloud, label: Læs op, widget: boolean, default: true }
+      - { name: archived, label: Fra den gamle blog, widget: hidden, default: false, required: false }
+      - name: body
+        label: Tekst
+        widget: markdown
+        hint: >-
+          Interaktive elementer – skriv dem på deres egen linje:
+          ::afstemning[Spørgsmål?]{valg="Ja|Nej|Måske"}   
+          ::holdning[Et udsagn man kan være enig eller uenig i]   
+          ::video[Billedtekst]{src="https://youtu.be/..."}   
+          og :vigtigt[ord] midt i en sætning.

@@ -1,0 +1,11 @@
+---
+import Base from '../layouts/Base.astro';
+import PostList from '../components/PostList.astro';
+import { getPublishedPosts } from '../lib/posts';
+const posts = await getPublishedPosts();
+---
+<Base>
+  <h1>Tanker, der må tegnes på</h1>
+  <p class="lede">Jeg skriver om at leve, lære, bygge ting og redde lidt af planeten. Stem, sig din mening, understreg det vigtige – eller skriv graffiti i marginen.</p>
+  <PostList posts={posts} />
+</Base>

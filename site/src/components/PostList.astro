@@ -1,0 +1,20 @@
+---
+import { formatDate, type Post } from '../lib/posts';
+interface Props { posts: Post[] }
+const { posts } = Astro.props;
+const now = new Date();
+---
+<ul class="post-list">
+  {posts.map((p) => (
+    <li>
+      <div class="meta">
+        <time datetime={p.data.publishDate.toISOString()}>{formatDate(p.data.publishDate)}</time>
+        {p.data.archived && <span class="archived-badge">Fra arkivet</span>}
+        {p.data.draft && <span class="archived-badge">Kladde</span>}
+        {p.data.publishDate > now && <span class="archived-badge">Planlagt</span>}
+      </div>
+      <h2><a href={`/${p.id}/`}>{p.data.title}</a></h2>
+      {p.data.description && <p>{p.data.description}</p>}
+    </li>
+  ))}
+</ul>

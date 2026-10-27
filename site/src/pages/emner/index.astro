@@ -1,0 +1,14 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getPublishedPosts, tagSlug } from '../../lib/posts';
+const posts = await getPublishedPosts();
+const counts = new Map<string, number>();
+for (const p of posts) for (const t of p.data.tags) counts.set(t, (counts.get(t) ?? 0) + 1);
+const tags = [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'da'));
+---
+<Base title="Emner">
+  <h1>Emner</h1>
+  <ul class="tags" style="font-size:1rem">
+    {tags.map(([t, n]) => <li><a href={`/emner/${tagSlug(t)}/`}>{t} <span style="opacity:.6">{n}</span></a></li>)}
+  </ul>
+</Base>

@@ -1,0 +1,177 @@
+name: Byg og udgiv bloggen
+
+# Push til main      => byg og udgiv (API'et kun hvis koden i api/ er ændret)
+# Hver time          => udgiv, hvis et planlagt indlæg er blevet modent
+# Pull requests      => byg kun
+# Manuelt            => udgiv alt (vælg "full" for også at udgive API'et)
+#
+# Kræver repository secrets (Settings → Secrets and variables → Actions):
+#   FTP_SERVER, FTP_USERNAME, FTP_PASSWORD   samme FTP-login som dine andre Simply-sites
+#   DB_CONNECTION_STRING                     MySQL-forbindelse til bloggens database
+#   ADMIN_KEY                                valgfri: nøgle til at moderere (slette) indhold
+# Valgfri repository variable: FTP_SERVER_DIR (standard: /blog/)
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '7 * * * *'
+  workflow_dispatch:
+    inputs:
+      full:
+        description: "Udgiv også API'et (siden er nede ca. et minut)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+env:
+  SERVER_DIR: ${{ vars.FTP_SERVER_DIR || '/blog/' }}
+
+jobs:
+  udgiv:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hent koden
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Installér Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Er der planlagte indlæg, der skal ud nu?
+        id: due
+        if: github.event_name == 'schedule'
+        working-directory: site
+        run: node scripts/due-posts.mjs
+
+      - name: Hvad skal udgives?
+        id: plan
+        env:
+          EVENT: ${{ github.event_name }}
+          DUE: ${{ steps.due.outputs.due }}
+          FULL: ${{ inputs.full }}
+          BEFORE: ${{ github.event.before }}
+          HAS_FTP: ${{ secrets.FTP_SERVER != '' }}
+        run: |
+          site=false; app=false; build=true
+          case "$EVENT" in
+            schedule)          site="$DUE"; build="$DUE" ;;
+            pull_request)      ;;
+            workflow_dispatch) site=true; app="$FULL" ;;
+            push)
+              site=true
+              if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ] \
+                 || ! git cat-file -e "$BEFORE" 2>/dev/null \
+                 || ! git diff --quiet "$BEFORE" HEAD -- api/ .github/workflows/; then
+                app=true
+              fi ;;
+          esac
+          if [ "$HAS_FTP" != "true" ] && [ "$site" = "true" ]; then
+            echo "::warning::FTP-secrets mangler, så sitet bliver kun bygget – ikke udgivet. Se README.md."
+            site=false; app=false
+          fi
+          echo "build=$build" >> "$GITHUB_OUTPUT"
+          echo "site=$site" >> "$GITHUB_OUTPUT"
+          echo "app=$app" >> "$GITHUB_OUTPUT"
+          echo "Byg: $build · Udgiv sider: $site · Udgiv API: $app"
+
+      - name: Byg sitet (Astro)
+        if: steps.plan.outputs.build == 'true'
+        working-directory: site
+        run: |
+          npm ci
+          npm run build
+
+      - name: Installér .NET 10
+        if: steps.plan.outputs.build == 'true'
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Byg API'et til Windows-serveren (self-contained)
+        if: steps.plan.outputs.build == 'true'
+        run: |
+          dotnet publish api/Blog.Api/Blog.Api.csproj -c Release -r win-x64 --self-contained true -o publish
+          # Den gamle blog havde "Web.config" med stort W. Samme navn, så FTP-uploaden overskriver den.
+          mv publish/web.config publish/Web.config
+          mkdir -p publish/wwwroot
+          cp -r site/dist/. publish/wwwroot/
+
+      - name: Skriv hemmelige indstillinger
+        if: steps.plan.outputs.app == 'true'
+        env:
+          DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
+          ADMIN_KEY: ${{ secrets.ADMIN_KEY }}
+        run: |
+          if [ -z "$DB_CONNECTION_STRING" ]; then echo "::error::Secret DB_CONNECTION_STRING mangler. Se README.md."; exit 1; fi
+          jq -n --arg db "$DB_CONNECTION_STRING" --arg key "$ADMIN_KEY" \
+            '{ConnectionStrings: {Database: $db}, Admin: {Key: $key}}' > publish/appsettings.Production.json
+
+      # IIS låser filerne, mens sitet kører. app_offline.htm stopper appen under upload.
+      - name: Sæt siden på pause
+        if: steps.plan.outputs.app == 'true'
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          printf '<!doctype html><meta charset="utf-8"><title>Opdateres</title><p style="font:20px Georgia,serif;margin:3em">Bloggen opdateres – prøv igen om et øjeblik.</p>' > app_offline.htm
+          curl --fail --silent --show-error --ssl-reqd --user "$FTP_USERNAME:$FTP_PASSWORD" -T app_offline.htm "ftp://$FTP_SERVER${SERVER_DIR}app_offline.htm"
+          sleep 15
+
+      - name: Upload API'et
+        if: steps.plan.outputs.app == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: ./publish/
+          server-dir: ${{ env.SERVER_DIR }}
+          timeout: 600000
+          exclude: |
+            wwwroot/**
+            **/logs/**
+
+      - name: Start siden igen
+        if: always() && steps.plan.outputs.app == 'true'
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          curl --fail --silent --show-error --ssl-reqd --user "$FTP_USERNAME:$FTP_PASSWORD" -Q "DELE ${SERVER_DIR}app_offline.htm" "ftp://$FTP_SERVER/" || echo "app_offline.htm var allerede fjernet"
+
+      # Statiske filer er ikke låst, så indlæg kan udgives uden nedetid.
+      - name: Upload sider og billeder
+        if: steps.plan.outputs.site == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: ./publish/wwwroot/
+          server-dir: ${{ env.SERVER_DIR }}wwwroot/
+          timeout: 600000
+
+      - name: Tjek at bloggen svarer
+        if: steps.plan.outputs.site == 'true'
+        run: |
+          ua="Mozilla/5.0 (Windows NT 10.0; Win64; x64) blog-deploy-check"
+          for i in 1 2 3 4 5 6; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' -A "$ua" https://blog.villadsclaes.dk/api/health || true)
+            [ "$code" = "200" ] && { echo "Bloggen svarer 200"; exit 0; }
+            echo "Forsøg $i: $code"; sleep 20
+          done
+          echo "::error::Bloggen svarer ikke efter udgivelsen"; exit 1

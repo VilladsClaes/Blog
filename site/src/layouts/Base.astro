@@ -1,0 +1,56 @@
+---
+import '../styles/global.css';
+import { sites } from '../data/sites';
+
+interface Props {
+  title?: string;
+  description?: string;
+  slug?: string;
+}
+const { title, description = 'Villads Claes skriver om at leve, lære, bygge og redde lidt af planeten – og du må gerne skrive med.', slug } = Astro.props;
+const fullTitle = title ? `${title} · Villads Claes` : 'Villads Claes · blog';
+const path = Astro.url.pathname;
+---
+<!doctype html>
+<html lang="da">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={new URL(path, Astro.site)} />
+    <link rel="alternate" type="application/rss+xml" title="Villads Claes · blog" href="/rss.xml" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:title" content={title ?? 'Villads Claes · blog'} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={slug ? 'article' : 'website'} />
+    <meta name="theme-color" content="#fbfaf7" />
+    <script is:inline>
+      try { const t = localStorage.getItem('theme'); if (t) document.documentElement.dataset.theme = t; } catch {}
+    </script>
+  </head>
+  <body data-slug={slug}>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="/">Villads Claes<span>.</span></a>
+        <nav aria-label="Hovedmenu">
+          <a href="/" aria-current={path === '/' ? 'page' : undefined}>Indlæg</a>
+          <a href="/emner/" aria-current={path.startsWith('/emner') ? 'page' : undefined}>Emner</a>
+          <a href="/sites/" aria-current={path.startsWith('/sites') ? 'page' : undefined}>Sites</a>
+          <a href="/rss.xml">RSS</a>
+        </nav>
+      </div>
+    </header>
+    <main class="wrap">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="wrap">
+        <div>© {new Date().getFullYear()} Villads Claes · Læsere må gerne understrege, kommentere og tegne på siderne.</div>
+        <ul>
+          {sites.map((s) => <li><a href={s.url}>{s.name}</a></li>)}
+        </ul>
+      </div>
+    </footer>
+  </body>
+</html>

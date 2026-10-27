@@ -1,0 +1,93 @@
+---
+import { render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { getPublishedPosts, formatDate, readingMinutes, tagSlug, type Post } from '../lib/posts';
+import { siteByKey } from '../data/sites';
+import { videoHtml } from '../plugins/directives.mjs';
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    props: { post, newer: posts[i - 1], older: posts[i + 1] },
+  }));
+}
+
+interface Props { post: Post; newer?: Post; older?: Post }
+const { post, newer, older } = Astro.props;
+const { Content } = await render(post);
+const d = post.data;
+const linkedSites = d.sites.map(siteByKey).filter((s) => s !== undefined);
+const features = Object.entries(d.interactive).filter(([, on]) => on).map(([k]) => k).join(' ');
+---
+<Base title={d.title} description={d.description} slug={post.id}>
+  <article class="post" data-features={features}>
+    <header>
+      <div class="meta">
+        <time datetime={d.publishDate.toISOString()}>{formatDate(d.publishDate)}</time>
+        <span>{readingMinutes(post.body)} min.</span>
+        {d.archived && <span class="archived-badge">Fra arkivet</span>}
+      </div>
+      <h1>{d.title}</h1>
+      {d.description && <p class="lede">{d.description}</p>}
+      {d.tags.length > 0 && (
+        <ul class="tags">{d.tags.map((t) => <li><a href={`/emner/${tagSlug(t)}/`}>{t}</a></li>)}</ul>
+      )}
+    </header>
+
+    <div class="x-tools sans" role="toolbar" aria-label="Værktøjer til indlægget" hidden></div>
+
+    {d.video && (
+      <div class="prose">
+        <Fragment set:html={videoHtml(d.video)} />
+      </div>
+    )}
+
+    <div class="prose" id="prose">
+      <Content />
+    </div>
+
+    {(linkedSites.length > 0 || d.links.length > 0) && (
+      <aside class="related">
+        <h2>Hører sammen med</h2>
+        <ul>
+          {linkedSites.map((s) => <li><a href={s.url}>{s.name}</a> – {s.description}</li>)}
+          {d.links.map((l) => <li><a href={l.url}>{l.title}</a></li>)}
+        </ul>
+      </aside>
+    )}
+
+    <section class="x-annotations sans" hidden>
+      <h2>Noter i marginen</h2>
+      <ol></ol>
+    </section>
+
+    {d.interactive.comments && (
+      <section class="x-comments sans" id="besyv">
+        <h2>Dit besyv</h2>
+        <ol class="x-comment-list"></ol>
+        <form class="x-comment-form">
+          <label>Navn <input name="name" maxlength="60" autocomplete="name" required /></label>
+          <label>Hvad tænker du? <textarea name="body" rows="4" maxlength="4000" required></textarea></label>
+          <label class="visually-hidden" aria-hidden="true">Lad være tom <input name="website" tabindex="-1" autocomplete="off" /></label>
+          <button type="submit">Send dit besyv</button>
+          <p class="x-form-status" role="status"></p>
+        </form>
+      </section>
+    )}
+
+    <nav class="related" aria-label="Flere indlæg">
+      <ul style="list-style:none;padding:0;display:flex;justify-content:space-between;gap:1rem">
+        <li>{older && <a href={`/${older.id}/`}>← {older.data.title}</a>}</li>
+        <li style="text-align:right">{newer && <a href={`/${newer.id}/`}>{newer.data.title} →</a>}</li>
+      </ul>
+    </nav>
+  </article>
+</Base>
+
+<script>
+  import '../scripts/interactive';
+</script>
+<style is:global>
+  @import '../styles/interactive.css';
+</style>

@@ -1,0 +1,13 @@
+node_modules/
+site/dist/
+site/.astro/
+api/**/bin/
+api/**/obj/
+api/Blog.Api/wwwroot/*
+!api/Blog.Api/wwwroot/.gitkeep
+*.db
+*.db-shm
+*.db-wal
+appsettings.*.local.json
+publish/
+.vs/

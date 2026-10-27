@@ -1,0 +1,22 @@
+---
+import Base from '../../layouts/Base.astro';
+import { sites } from '../../data/sites';
+import { getPublishedPosts } from '../../lib/posts';
+const posts = await getPublishedPosts();
+---
+<Base title="Sites" description="Mine andre websites og de indlæg, der hører til dem.">
+  <h1>Sites</h1>
+  <p class="lede">Indlæg på bloggen kan høre til mine andre projekter. Her er de.</p>
+  <ul class="post-list">
+    {sites.map((s) => {
+      const n = posts.filter((p) => p.data.sites.includes(s.key)).length;
+      return (
+        <li>
+          <div class="meta"><a href={s.url}>{s.url.replace('https://', '')}</a><span>{n} indlæg</span></div>
+          <h2><a href={`/sites/${s.key}/`}>{s.name}</a></h2>
+          <p>{s.description}</p>
+        </li>
+      );
+    })}
+  </ul>
+</Base>
