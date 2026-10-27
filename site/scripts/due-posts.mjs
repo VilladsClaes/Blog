@@ -8,7 +8,7 @@ const from = now - windowMinutes * 60_000;
 const due = [];
 
 for (const file of readdirSync('src/content/posts').filter((f) => f.endsWith('.md'))) {
-  const fm = readFileSync(`src/content/posts/${file}`, 'utf8').match(/^---\n([\s\S]*?)\n---/)?.[1] ?? '';
+  const fm = readFileSync(`src/content/posts/${file}`, 'utf8').match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] ?? '';
   if (/^draft:\s*true/m.test(fm)) continue;
   const raw = fm.match(/^publishDate:\s*["']?([^"'\n]+)/m)?.[1];
   const t = raw ? Date.parse(raw) : NaN;
