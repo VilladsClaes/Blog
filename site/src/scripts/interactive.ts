@@ -176,7 +176,34 @@ function setupCommentForm() {
 /* ---------- Oplæsning ---------- */
 
 function setupReadAloud() {
-  if (!features.has('readAloud') || !('speechSynthesis' in window)) return;
+  if (!features.has('readAloud')) return;
+
+  // Har indlægget en indlæst version i min egen stemme, bruger vi den i stedet for browserens stemme.
+  const voiceAudio = document.getElementById('post-voice') as HTMLAudioElement | null;
+  if (voiceAudio) {
+    const rates = [1, 1.25, 1.5, 0.85];
+    let rateIndex = 0;
+    const playBtn = h('button', { type: 'button', onclick: () => {
+      if (voiceAudio.paused) voiceAudio.play().catch(() => toast('Lyden kunne ikke afspilles.'));
+      else voiceAudio.pause();
+    } }, '▶ Lyt');
+    const stopBtn = h('button', { type: 'button', hidden: true, 'aria-label': 'Stop oplæsning', onclick: () => {
+      voiceAudio.pause(); voiceAudio.currentTime = 0;
+      playBtn.textContent = '▶ Lyt'; stopBtn.hidden = true;
+    } }, '■');
+    const rateBtn = h('button', { type: 'button', hidden: true, title: 'Hastighed', onclick: () => {
+      rateIndex = (rateIndex + 1) % rates.length;
+      voiceAudio.playbackRate = rates[rateIndex];
+      rateBtn.textContent = `${rates[rateIndex]}×`;
+    } }, '1×');
+    voiceAudio.addEventListener('play', () => { playBtn.textContent = '❚❚ Pause'; stopBtn.hidden = false; rateBtn.hidden = false; });
+    voiceAudio.addEventListener('pause', () => { playBtn.textContent = '▶ Fortsæt'; });
+    voiceAudio.addEventListener('ended', () => { playBtn.textContent = '▶ Lyt'; stopBtn.hidden = true; });
+    tools.append(h('span', { class: 'x-group' }, playBtn, rateBtn, stopBtn));
+    return;
+  }
+
+  if (!('speechSynthesis' in window)) return;
   const synth = window.speechSynthesis;
   const rates = [1, 1.25, 1.5, 0.85];
   let rateIndex = 0;

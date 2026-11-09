@@ -1,0 +1,73 @@
+---
+import Base from '../layouts/Base.astro';
+
+interface Props {
+  title: string;
+  intro: string;
+  active: 'video' | 'tekst' | 'billede';
+}
+
+const { title, intro, active } = Astro.props;
+const tabs = [
+  { key: 'video', href: '/studie/video/', label: 'Video' },
+  { key: 'tekst', href: '/studie/tekst/', label: 'Tekst' },
+  { key: 'billede', href: '/studie/billede/', label: 'Billede' },
+];
+---
+
+<Base title={title} description={intro} noindex>
+  <div class="studio">
+    <nav class="studio-nav" aria-label="Vælg opslagstype">
+      <a href="/studie/" class:list={['studio-nav-home', { 'is-active': false }]}>Opslagsstudie</a>
+      {tabs.map((tab) => (
+        <a href={tab.href} class:list={{ 'is-active': tab.key === active }} aria-current={tab.key === active ? 'page' : undefined}>
+          {tab.label}
+        </a>
+      ))}
+    </nav>
+
+    <header class="studio-head">
+      <p class="meta"><a href="/studie/">← Alle opslagstyper</a></p>
+      <h1>{title}</h1>
+      <p class="lede">{intro}</p>
+    </header>
+
+    <details class="studio-settings">
+      <summary>GitHub-forbindelse <span class="studio-summary-note">– kun nødvendig for at udgive direkte</span></summary>
+      <div class="studio-fields studio-fields-3">
+        <label>
+          GitHub-token
+          <input id="gh-token" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…" />
+        </label>
+        <label>
+          Repository
+          <input id="gh-repo" value="VilladsClaes/Blog" spellcheck="false" />
+        </label>
+        <label>
+          Gren
+          <input id="gh-branch" value="main" spellcheck="false" />
+        </label>
+      </div>
+      <div class="studio-row">
+        <button type="button" id="gh-save">Gem i denne browser</button>
+        <button type="button" id="gh-test" class="is-secondary">Test forbindelse</button>
+        <button type="button" id="gh-forget" class="is-link">Glem token</button>
+      </div>
+      <p id="gh-status" class="studio-status" role="status"></p>
+      <p class="studio-help">
+        Brug det samme fine-grained token som til skriveværktøjet, med <strong>Contents: Read and write</strong> til
+        <code>VilladsClaes/Blog</code>. Token'et gemmes kun i denne browser og sendes direkte til GitHub – aldrig til bloggens server.
+      </p>
+    </details>
+
+    <slot />
+  </div>
+</Base>
+
+<script>
+  import '../scripts/studio/settings';
+</script>
+
+<style is:global>
+  @import '../styles/studio.css';
+</style>

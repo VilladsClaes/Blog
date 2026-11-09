@@ -1,0 +1,158 @@
+---
+import StudioShell from '../../components/StudioShell.astro';
+import StudioPublish from '../../components/StudioPublish.astro';
+---
+
+<StudioShell
+  title="Tekstopslag"
+  intro="Skriv teksten og formgiv den undervejs: kolonner, citatfremhævelser, skrifttyper, TLDR og udvidede detaljer. Forhåndsvisningen bruger samme layout som bloggen."
+  active="tekst"
+>
+  <div class="studio-work">
+    <section class="studio-card">
+      <div class="studio-card-head">
+        <h2>Skriv og formgiv</h2>
+        <p>Markér tekst og tryk på et værktøj. Blokkene kan redigeres som almindelig Markdown.</p>
+      </div>
+
+      <div class="studio-toolbar" role="toolbar" aria-label="Formgivning af teksten">
+        <button type="button" data-action="bold" title="Fed"><strong>B</strong></button>
+        <button type="button" data-action="italic" title="Kursiv"><em>I</em></button>
+        <button type="button" data-action="h2" title="Overskrift">H2</button>
+        <button type="button" data-action="h3" title="Underoverskrift">H3</button>
+        <span class="studio-toolbar-sep" aria-hidden="true"></span>
+        <button type="button" data-action="ul" title="Punktliste">• Liste</button>
+        <button type="button" data-action="ol" title="Nummereret liste">1. Liste</button>
+        <button type="button" data-action="quote" title="Citat">› Citat</button>
+        <button type="button" data-action="link" title="Link">Link</button>
+        <span class="studio-toolbar-sep" aria-hidden="true"></span>
+        <button type="button" data-action="tldr" title="Kort resumé">TLDR</button>
+        <button type="button" data-action="details" title="Udfoldelige detaljer">Detaljer</button>
+        <button type="button" data-action="columns2" title="To kolonner">2 kolonner</button>
+        <button type="button" data-action="columns3" title="Tre kolonner">3 kolonner</button>
+        <button type="button" data-action="pullquote" title="Fremhævet citat">Citatfremhævelse</button>
+        <button type="button" data-action="callout" title="Faktaboks">Faktaboks</button>
+        <span class="studio-toolbar-sep" aria-hidden="true"></span>
+        <button type="button" data-action="fontSans" title="Sans i et afsnit">Sans</button>
+        <button type="button" data-action="fontMono" title="Mono i et afsnit">Mono</button>
+        <button type="button" data-action="image" title="Billede">Billede</button>
+        <button type="button" data-action="video" title="Video">Video</button>
+      </div>
+
+      <div class="studio-editor-grid">
+        <div>
+          <div class="studio-preview-label">
+            <span>Markdown</span>
+            <span id="txt-count"></span>
+          </div>
+          <textarea
+            id="txt-editor"
+            class="studio-editor"
+            spellcheck="true"
+            placeholder="Skriv dit opslag her …&#10;&#10;Prøv fx at markere et afsnit og trykke på »TLDR« eller »2 kolonner«."
+          ></textarea>
+        </div>
+        <div>
+          <div class="studio-preview-label">
+            <span>Forhåndsvisning</span>
+            <button type="button" id="txt-speak" class="is-link">Hør teksten</button>
+          </div>
+          <article id="txt-preview" class="prose studio-preview" data-font="serif"></article>
+        </div>
+      </div>
+
+      <details id="stemme" class="studio-voice-sample">
+        <summary><strong>Læs op i min egen stemme</strong> – optag en prøve og lav en stemmeklon</summary>
+        <p class="studio-help">
+          Bloggen kan vise en indlæst version af indlægget med din stemme. Optag en rolig prøve på 30–60 sekunder her,
+          eller brug den stemmeprofil, du allerede har fra BørneTV-projektet. Prøven bruges kun til at lave en stemmeklon
+          hos din udbyder (fx ElevenLabs) – den uploades ikke til bloggen.
+        </p>
+        <blockquote class="studio-voice-script">
+          Jeg hedder Villads, og det her er min stemme. Jeg læser langsomt og tydeligt, så den kan bruges til at klone mig.
+          Om morgenen cykler jeg gennem byen, og om aftenen skriver jeg om alt det, jeg gerne vil forstå.
+          Der er forskel på at læse højt og at fortælle, og jeg prøver at gøre det sidste.
+          Hvis du kan høre, hvem der taler, så er det det, jeg gerne vil have med videre.
+        </blockquote>
+        <div class="studio-row">
+          <button type="button" id="voice-record">Optag stemmeprøve</button>
+          <button type="button" id="voice-stop" class="is-secondary" disabled>Stop</button>
+          <button type="button" id="voice-download" class="is-secondary" disabled>Hent prøven</button>
+        </div>
+        <audio id="voice-playback" controls hidden></audio>
+        <p id="voice-status" class="studio-status" role="status"></p>
+        <ol class="studio-steps">
+          <li>Åbn din stemmeprofil fra BørneTV-projektet, eller lav en ny stemmeklon hos udbyderen og kopiér <strong>voice-id</strong>.</li>
+          <li>Sæt nøglen og voice-id'et som miljøvariabler og kør kommandoen nedenfor i <code>site/</code>. Så laves en MP3 og der sættes et <code>voice:</code>-felt i indlægget.</li>
+          <li>Læserne får en »Lyt med min stemme«-afspiller øverst i indlægget – og browserens egen oplæsning som reserve.</li>
+        </ol>
+        <pre class="studio-code"><code>ELEVENLABS_API_KEY=… ELEVENLABS_VOICE_ID=… npm run voice -- &lt;slug&gt;</code></pre>
+        <div class="studio-row">
+          <button type="button" id="voice-copy-command" class="is-secondary">Kopiér kommandoen</button>
+          <a class="studio-link" href="https://elevenlabs.io/voice-cloning" target="_blank" rel="noreferrer">Sådan laves en stemmeklon</a>
+        </div>
+      </details>
+    </section>
+
+    <aside>
+      <StudioPublish />
+      <section class="studio-card">
+        <div class="studio-card-head">
+          <h2>Sådan virker blokkene</h2>
+        </div>
+        <pre class="studio-code"><code>::tldr&#123;titel="Kort fortalt"&#125;
+Det vigtigste …
+::
+
+::detaljer&#123;titel="Uddybning"&#125;
+Alt det lange …
+::
+
+::::kolonner&#123;antal="2"&#125;
+:::kolonne
+Venstre …
+:::
+:::kolonne
+Højre …
+:::
+::::
+
+::citat&#123;kilde="Navn"&#125;
+En sætning …
+::</code></pre>
+        <p class="studio-help">
+          Skrifttypen kan vælges for hele indlægget i udgivelsesfeltet, eller for enkelte afsnit med
+          <code>::skrift&#123;font="sans"&#125;</code>. TLDR kan også udfyldes som felt – så står den øverst.
+        </p>
+      </section>
+    </aside>
+  </div>
+</StudioShell>
+
+<script>
+  import '../../scripts/studio/text';
+</script>
+
+<style is:global>
+  .studio-voice-script {
+    margin: 0.75rem 0;
+    padding: 0.8rem 1rem;
+    border-left: 3px solid var(--accent);
+    background: var(--soft);
+    font: 0.95rem/1.6 var(--serif);
+    font-style: italic;
+  }
+  .studio-code {
+    margin: 0.75rem 0;
+    padding: 0.8rem 0.9rem;
+    background: var(--soft);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow-x: auto;
+    font: 0.78rem/1.6 var(--mono);
+    white-space: pre;
+  }
+  .studio-link { font: 0.85rem var(--sans); color: var(--accent); }
+  .studio-voice-sample > summary { cursor: pointer; font: 600 0.92rem var(--sans); }
+  .studio-voice-sample[open] > summary { margin-bottom: 0.6rem; }
+</style>

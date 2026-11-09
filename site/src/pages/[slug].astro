@@ -21,7 +21,7 @@ const linkedSites = d.sites.map(siteByKey).filter((s) => s !== undefined);
 const features = Object.entries(d.interactive).filter(([, on]) => on).map(([k]) => k).join(' ');
 ---
 <Base title={d.title} description={d.description} slug={post.id}>
-  <article class="post" data-features={features}>
+  <article class="post" data-features={features} data-font={d.font}>
     <header>
       <div class="meta">
         <time datetime={d.publishDate.toISOString()}>{formatDate(d.publishDate)}</time>
@@ -35,11 +35,31 @@ const features = Object.entries(d.interactive).filter(([, on]) => on).map(([k]) 
       )}
     </header>
 
+    {d.cover && (
+      <figure class="post-cover">
+        <img src={d.cover} alt="" loading="eager" decoding="async" fetchpriority="high" />
+      </figure>
+    )}
+
     <div class="x-tools sans" role="toolbar" aria-label="Værktøjer til indlægget" hidden></div>
+
+    {d.tldr && (
+      <aside class="x-tldr">
+        <p class="x-tldr-title">TLDR</p>
+        <p>{d.tldr}</p>
+      </aside>
+    )}
+
+    {d.voice && (
+      <figure class="x-voice sans">
+        <figcaption>Lyt med min stemme</figcaption>
+        <audio id="post-voice" controls preload="metadata" src={d.voice}></audio>
+      </figure>
+    )}
 
     {d.video && (
       <div class="prose">
-        <Fragment set:html={videoHtml(d.video)} />
+        <Fragment set:html={videoHtml(d.video, d.videoFormat)} />
       </div>
     )}
 

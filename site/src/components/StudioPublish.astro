@@ -1,0 +1,63 @@
+---
+// De fælles oplysninger, som alle opslagstyper udgiver med.
+---
+<section class="studio-card studio-publish" aria-labelledby="pub-heading">
+  <div class="studio-card-head">
+    <h2 id="pub-heading">Udgiv opslaget</h2>
+    <p>Udfyld det, der skal stå øverst i indlægget. Adressen laves automatisk ud fra titlen, men kan ændres.</p>
+  </div>
+
+  <div class="studio-fields">
+    <label>
+      Titel
+      <input id="pub-title" type="text" required maxlength="120" placeholder="Fx En tur i skoven" />
+    </label>
+    <label>
+      Kort beskrivelse
+      <textarea id="pub-desc" rows="2" maxlength="400" placeholder="Vises i listen og i delelinks"></textarea>
+    </label>
+    <label>
+      Adresse (slug)
+      <input id="pub-slug" type="text" maxlength="80" spellcheck="false" placeholder="laves automatisk" />
+    </label>
+    <label>
+      Emner
+      <input id="pub-tags" type="text" placeholder="skov, vinter, familie" />
+    </label>
+    <label>
+      Hører til sites
+      <input id="pub-sites" type="text" placeholder="fx hyponet, longbets" />
+    </label>
+    <label>
+      Udgivelsesdato
+      <input id="pub-date" type="datetime-local" />
+    </label>
+    <label>
+      TLDR (valgfri)
+      <textarea id="pub-tldr" rows="2" maxlength="500" placeholder="To-tre linjer, som læseren kan nøjes med"></textarea>
+    </label>
+    <label>
+      Skrifttype
+      <select id="pub-font">
+        <option value="serif">Serif (avisen)</option>
+        <option value="sans">Sans (skærmen)</option>
+        <option value="mono">Mono (koden)</option>
+        <option value="haandskrift">Håndskrift</option>
+      </select>
+    </label>
+    <label class="studio-check">
+      <input id="pub-draft" type="checkbox" checked />
+      Gem som kladde (ikke synlig på bloggen)
+    </label>
+  </div>
+
+  <div class="studio-row studio-actions">
+    <button type="button" id="pub-go">Udgiv til bloggen</button>
+    <button type="button" id="pub-copy" class="is-secondary">Kopiér Markdown</button>
+  </div>
+  <p id="pub-status" class="studio-status" role="status"></p>
+  <p class="studio-help">
+    Med GitHub-forbindelsen ovenfor committes indlægget direkte til repoet, og GitHub Actions bygger bloggen om et par minutter.
+    Uden token kan du hente mediet her og kopiere Markdown til skriveværktøjet på <a href="/admin/">/admin/</a>.
+  </p>
+</section>

@@ -35,6 +35,16 @@ collections:
     fields:
       - { name: title, label: Titel, widget: string }
       - { name: description, label: Kort beskrivelse, widget: text, required: false }
+      - { name: tldr, label: TLDR (vises øverst), widget: text, required: false, hint: 'To-tre linjer, som læseren kan nøjes med. Resten kan gemmes i ::detaljer i teksten.' }
+      - name: font
+        label: Skrifttype
+        widget: select
+        default: serif
+        options:
+          - { label: Serif (avisen), value: serif }
+          - { label: Sans (skærmen), value: sans }
+          - { label: Mono (koden), value: mono }
+          - { label: Håndskrift, value: haandskrift }
       - name: publishDate
         label: Udgivelsestidspunkt
         widget: datetime
@@ -67,6 +77,15 @@ collections:
           - { name: title, label: Tekst, widget: string }
           - { name: url, label: Adresse, widget: string }
       - { name: video, label: Video øverst (YouTube/Vimeo/mp4-link), widget: string, required: false }
+      - name: videoFormat
+        label: Videoformat
+        widget: select
+        required: false
+        options:
+          - { label: Vandret (16:9), value: vandret }
+          - { label: Lodret (9:16 – Reels/Shorts), value: lodret }
+      - { name: cover, label: Forsidebillede, widget: image, required: false, media_folder: site/public/media/uploads, public_folder: /media/uploads }
+      - { name: voice, label: Oplæsning i min stemme (mp3-sti), widget: string, required: false, hint: 'Kør npm run voice -- <slug> i site/ for at lave filen. Fx /media/voice/min-slug.mp3' }
       - name: interactive
         label: Interaktive funktioner
         widget: object
@@ -82,8 +101,30 @@ collections:
         label: Tekst
         widget: markdown
         hint: >-
-          Interaktive elementer – skriv dem på deres egen linje:
+          Interaktive elementer – skriv dem på deres egen linje:   
           ::afstemning[Spørgsmål?]{valg="Ja|Nej|Måske"}   
           ::holdning[Et udsagn man kan være enig eller uenig i]   
-          ::video[Billedtekst]{src="https://youtu.be/..."}   
-          og :vigtigt[ord] midt i en sætning.
+          ::video[Billedtekst]{src="https://youtu.be/..." format="lodret"}   
+          ::billede[Billedtekst]{src="/media/..." alt="Beskrivelse" bred}   
+          og :vigtigt[ord] midt i en sætning.   
+          Blokke (brug længere hegn omkring, når de ligger inde i hinanden):   
+          ::tldr{titel="Kort fortalt"}   
+          …   
+          ::   
+          ::detaljer{titel="De udvidede detaljer"}   
+          …   
+          ::   
+          ::::kolonner{antal="2"}   
+          :::kolonne   
+          …   
+          :::   
+          :::kolonne   
+          …   
+          :::   
+          ::::   
+          ::citat{kilde="Navn"}   
+          …   
+          ::   
+          ::faktaboks{titel="Godt at vide"}   
+          …   
+          ::

@@ -19,6 +19,83 @@ En enkel blog, hvor læserne må sætte spor: stemme, sige deres mening, underst
 
 **Direkte i GitHub:** Du kan også oprette en `.md`-fil i `site/src/content/posts/` via GitHub-appen eller github.com.
 
+**Endnu hurtigere:** Brug opslagsstudiet på <https://blog.villadsclaes.dk/studie/>. Her kan du optage video fra webcam, skrive med layoutværktøjer, tage billeder med telefonen og udgive det hele uden at forlade bloggen.
+
+### Opslagsstudiet (`/studie/`)
+
+Studiet er et authoring-værktøj og er markeret med `noindex`. Det bruger den samme GitHub-forbindelse som skriveværktøjet:
+
+1. Lav et fine-grained token med adgang til `VilladsClaes/Blog` og **Contents: Read and write**.
+2. Åbn en opslagstype, fold *GitHub-forbindelse* ud, indsæt token'et og tryk *Test forbindelse*.
+3. Token'et gemmes kun i browserens `localStorage` og sendes direkte til GitHub – ikke til bloggens server.
+
+Uden token kan du stadig hente mediet og kopiere Markdown til `/admin/`.
+
+#### Video
+
+`/studie/video/` åbner webcam og mikrofon direkte i browseren. Optag op til 3 minutter, sæt klipstart og klipslut, og vælg:
+
+- **Lodret 9:16** til Instagram Reels og YouTube Shorts.
+- **Vandret 16:9** til YouTube.
+
+Klippet dannes i realtid i browseren. Chrome/Android giver en WebM-fil; iPhone/Safari giver MP4, som Instagram tager direkte. YouTube tager begge. Studiet laver også færdige Instagram- og YouTube-tekster ud fra titel, beskrivelse og emner.
+
+Ved udgivelse uploades klippet til `site/public/media/uploads/<slug>/` og indlægget får en `::video`-blok med `format="lodret"`.
+
+#### Tekst
+
+`/studie/tekst/` har en værktøjslinje og live-forhåndsvisning. Blokkene kan også skrives i hånden:
+
+```md
+::tldr{titel="Kort fortalt"}
+Det vigtigste …
+::
+
+::detaljer{titel="De udvidede detaljer"}
+Alt det lange …
+::
+
+::::kolonner{antal="2"}
+:::kolonne
+Venstre …
+:::
+:::kolonne
+Højre …
+:::
+::::
+
+::citat{kilde="Navn"}
+En sætning, der skal frem …
+::
+
+::skrift{font="sans"}
+Et afsnit i sans …
+::
+
+::faktaboks{titel="Godt at vide"}
+En kort boks …
+::
+```
+
+Skrifttypen kan også vælges for hele indlægget med `font:` i frontmatter (`serif`, `sans`, `mono`, `haandskrift`). `tldr:` i frontmatter giver en TLDR-boks øverst. Læg mærke til, at indlejrede blokke bruger ét kolon mere i hegnet end den ydre blok.
+
+#### Billede
+
+`/studie/billede/` kan åbne telefonens kamera, tage flere billeder, dreje dem og bruge det første som forsidebillede. Billederne skaleres til max. 2000 px og gemmes som JPEG.
+
+**Google Fotos:** På iPhone og Android kan Google Fotos vælges i telefonens egen billedvælger. Vil du hente direkte fra Google Fotos, skal du lave et Google Cloud-projekt med **Photos Picker API** og en OAuth-webklient til bloggens origin og indsætte klient-id'et i `site/src/data/google.ts`. Klient-id'er er offentlige. Uden opsætning vises knappen ikke, men billedvælgeren virker stadig.
+
+#### Lyd (på grenen `lydopslag`)
+
+Lydstudiet ligger bevidst på en separat git-gren, så video-, tekst- og billedstudiet kan udgives først. På grenen findes:
+
+- optagelse med mikrofon, niveau- og bølgevisning, klipning og MP3-eksport med ID3-tags,
+- udgivelse som lydopslag med afspiller,
+- podcast-feed på `/podcast.xml` med iTunes-tags,
+- show notes og eksport til Podbean, Substack og andre podcastportaler.
+
+Skift gren med `git switch lydopslag`. Se grenens README-afsnit for detaljer.
+
 ### Interaktive elementer i teksten
 
 Skriv dem på deres egen linje:
@@ -32,6 +109,21 @@ Skriv dem på deres egen linje:
 Og midt i en sætning: `Det her er :vigtigt[rigtig vigtigt].`
 
 Understregninger, noter, graffiti, oplæsning og besyv er slået til på alle indlæg. De kan slås fra pr. indlæg under *Interaktive funktioner*.
+
+### Læs op i min egen stemme
+
+Et indlæg kan få en indlæst version i din egen stemme. Læserne ser en *Lyt med min stemme*-afspiller øverst, og browserens oplæsning virker stadig som reserve.
+
+1. Brug stemmeprofilen fra BørneTV-projektet hos din TTS-udbyder (fx ElevenLabs), eller lav en ny stemmeklon. Stemmeprøven kan optages under *Tekst* → *Læs op i min egen stemme*.
+2. Sæt miljøvariablerne og kør scriptet i `site/`:
+
+```bash
+ELEVENLABS_API_KEY=… ELEVENLABS_VOICE_ID=… npm run voice -- min-slug
+```
+
+Scriptet læser titel, beskrivelse og den rene tekst, laver `site/public/media/voice/<slug>.mp3` og sætter `voice:` i indlæggets frontmatter. Brug `--no-patch`, hvis du selv vil indsætte linjen. Nøglen og voice-id'et ligger kun i miljøet – aldrig i repoet.
+
+### Knyt et indlæg til dine andre sites
 
 ### Knyt et indlæg til dine andre sites
 
@@ -60,6 +152,8 @@ Hvis bloggen ligger i en anden FTP-mappe end `/blog/`, sættes repository-variab
 
 ```bash
 cd site && npm install && npm run dev        # http://localhost:4321 – viser også kladder og planlagte indlæg
+npm run build                                # bygger hele bloggen inkl. /studie/
+npm run voice -- <slug>                      # laver oplæsning (kræver ELEVENLABS_API_KEY og ELEVENLABS_VOICE_ID)
 ```
 
 ```bash

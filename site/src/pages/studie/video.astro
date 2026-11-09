@@ -1,0 +1,131 @@
+---
+import StudioShell from '../../components/StudioShell.astro';
+import StudioPublish from '../../components/StudioPublish.astro';
+---
+
+<StudioShell
+  title="Videoopslag"
+  intro="Optag direkte fra kameraet, klip optagelsen til og eksportér den i lodret 9:16 til Instagram Reels og YouTube Shorts – eller i vandret 16:9 til YouTube. Teksterne til begge tjenester laves automatisk."
+  active="video"
+>
+  <div class="studio-work">
+    <section class="studio-card">
+      <div class="studio-card-head">
+        <h2>Optag</h2>
+        <p>Kameraet åbner først, når du trykker på knappen. Optagelsen bliver i browseren, indtil du udgiver eller henter den.</p>
+      </div>
+
+      <div id="video-permission" class="studio-empty">
+        <div>
+          <p>Bloggen skal have lov til at bruge kameraet og mikrofonen.</p>
+          <button type="button" id="video-start">Åbn kamera</button>
+          <p id="video-error" class="studio-status" role="alert"></p>
+        </div>
+      </div>
+
+      <div id="video-stage" hidden>
+        <div class="studio-video-stage" id="video-frame">
+          <video id="video-cam" autoplay muted playsinline></video>
+          <div class="studio-video-overlay">
+            <span class="studio-timer" id="video-timer">00:00</span>
+            <span id="video-mime-note"></span>
+          </div>
+        </div>
+        <div class="studio-row">
+          <button type="button" id="video-record" class="studio-record-button">Optag</button>
+          <button type="button" id="video-pause" class="is-secondary" disabled>❚❚ Pause</button>
+          <button type="button" id="video-stop" class="is-secondary" disabled>Stop</button>
+          <label class="studio-check" style="grid-column:auto;margin-left:auto">
+            <input id="video-mirror" type="checkbox" />
+            Spejlvend
+          </label>
+        </div>
+        <div class="studio-fields" style="margin-top:0.85rem">
+          <label>
+            Kamera
+            <select id="video-camera"><option>Standard</option></select>
+          </label>
+          <label>
+            Mikrofon
+            <select id="video-mic"><option>Standard</option></select>
+          </label>
+        </div>
+        <p class="studio-help">Optagelsen stopper automatisk efter 3 minutter. Til Reels og Shorts er 30–60 sekunder ofte bedst.</p>
+      </div>
+
+      <div id="video-result" hidden>
+        <video id="video-playback" controls playsinline style="width:100%;border-radius:10px;background:#000"></video>
+        <div class="studio-trim">
+          <label>
+            Klipstart · <span id="video-trim-start-label">00:00</span>
+            <input id="video-trim-start" type="range" min="0" max="0" step="0.1" value="0" />
+          </label>
+          <label>
+            Klipslut · <span id="video-trim-end-label">00:00</span>
+            <input id="video-trim-end" type="range" min="0" max="0" step="0.1" value="0" />
+          </label>
+          <div class="studio-trim-row">
+            <button type="button" id="video-set-start" class="is-secondary">Brug afspillerens position som start</button>
+            <button type="button" id="video-set-end" class="is-secondary">… og som slut</button>
+          </div>
+        </div>
+
+        <div class="studio-radio-row" role="group" aria-label="Klipformat">
+          <label><input type="radio" name="video-format" value="9x16" checked /> Lodret 9:16 · Reels/Shorts</label>
+          <label><input type="radio" name="video-format" value="16x9" /> Vandret 16:9 · YouTube</label>
+        </div>
+
+        <div class="studio-row">
+          <button type="button" id="video-export">Lav klip</button>
+          <button type="button" id="video-download" class="is-secondary" disabled>Hent klippet</button>
+          <button type="button" id="video-retake" class="is-link">Optag igen</button>
+        </div>
+        <div id="video-progress" class="studio-progress" hidden><span></span></div>
+        <p id="video-export-status" class="studio-status" role="status"></p>
+        <p class="studio-help">
+          Klippet dannes i realtid og afspilles, mens det bliver til. I Chrome bliver filen WebM; iPhone/Safari laver MP4,
+          som Instagram tager direkte. YouTube tager begge.
+        </p>
+      </div>
+    </section>
+
+    <aside>
+      <StudioPublish />
+
+      <section class="studio-card">
+        <div class="studio-card-head">
+          <h2>Tekster til deling</h2>
+          <p>Opdateres fra titel, beskrivelse og emner ovenfor.</p>
+        </div>
+        <div class="studio-captions">
+          <label>
+            Instagram
+            <textarea id="caption-instagram" rows="5"></textarea>
+          </label>
+          <div class="studio-row" style="margin-top:0">
+            <button type="button" id="caption-copy-instagram" class="is-secondary">Kopiér Instagram-tekst</button>
+          </div>
+          <label>
+            YouTube-titel
+            <input id="caption-youtube-title" type="text" maxlength="100" />
+          </label>
+          <label>
+            YouTube-beskrivelse
+            <textarea id="caption-youtube-desc" rows="5"></textarea>
+          </label>
+          <div class="studio-row" style="margin-top:0">
+            <button type="button" id="caption-copy-youtube" class="is-secondary">Kopiér YouTube-tekst</button>
+          </div>
+        </div>
+        <p class="studio-help">
+          Når klippet er hentet, uploader du det til Instagram/YouTube og indsætter linket i feltet
+          <code>::video</code> i Markdown – eller lader studiet uploade selve filen til bloggen.
+        </p>
+      </section>
+    </aside>
+  </div>
+</StudioShell>
+
+<script>
+  import '../../scripts/studio/video';
+</script>

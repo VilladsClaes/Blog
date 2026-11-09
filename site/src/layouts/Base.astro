@@ -6,8 +6,9 @@ interface Props {
   title?: string;
   description?: string;
   slug?: string;
+  noindex?: boolean;
 }
-const { title, description = 'Villads Claes skriver om at leve, lære, bygge og redde lidt af planeten – og du må gerne skrive med.', slug } = Astro.props;
+const { title, description = 'Villads Claes skriver om at leve, lære, bygge og redde lidt af planeten – og du må gerne skrive med.', slug, noindex = false } = Astro.props;
 const fullTitle = title ? `${title} · Villads Claes` : 'Villads Claes · blog';
 const path = Astro.url.pathname;
 ---
@@ -25,6 +26,7 @@ const path = Astro.url.pathname;
     <meta property="og:description" content={description} />
     <meta property="og:type" content={slug ? 'article' : 'website'} />
     <meta name="theme-color" content="#fbfaf7" />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <script is:inline>
       try { const t = localStorage.getItem('theme'); if (t) document.documentElement.dataset.theme = t; } catch {}
     </script>
@@ -37,6 +39,7 @@ const path = Astro.url.pathname;
           <a href="/" aria-current={path === '/' ? 'page' : undefined}>Indlæg</a>
           <a href="/emner/" aria-current={path.startsWith('/emner') ? 'page' : undefined}>Emner</a>
           <a href="/sites/" aria-current={path.startsWith('/sites') ? 'page' : undefined}>Sites</a>
+          <a href="/studie/" aria-current={path.startsWith('/studie') ? 'page' : undefined}>✎ Nyt opslag</a>
           <a href="/rss.xml">RSS</a>
         </nav>
       </div>

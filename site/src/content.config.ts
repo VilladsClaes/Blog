@@ -17,7 +17,14 @@ const posts = defineCollection({
     sites: z.array(z.string()).default([]),
     links: z.array(z.object({ title: z.string(), url: z.string().url() })).default([]),
     video: z.string().optional(),
+    videoFormat: z.enum(['vandret', 'lodret']).optional(),
     cover: z.string().optional(),
+    // Kort resumé øverst – kan også skrives som ::tldr i teksten.
+    tldr: z.string().optional(),
+    // Skrifttypen for hele indlægget. Enkelte afsnit kan overstyres med ::skrift.
+    font: z.enum(['serif', 'sans', 'mono', 'haandskrift']).default('serif'),
+    // Lydfil med indlæst oplæsning i din egen stemme (fx /media/voice/<slug>.mp3).
+    voice: z.string().optional(),
     archived: z.boolean().default(false),
     interactive: z
       .object({

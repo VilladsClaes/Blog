@@ -1,0 +1,80 @@
+---
+import StudioShell from '../../components/StudioShell.astro';
+import StudioPublish from '../../components/StudioPublish.astro';
+import { googlePhotosClientId } from '../../data/google';
+---
+
+<StudioShell
+  title="Billedopslag"
+  intro="Tag billeder direkte med telefonens kamera, vælg fra telefonens billeder – hvor Google Fotos også ligger – eller forbind Google Fotos for at hente billeder direkte. Drej, beskrev og udgiv som et billedopslag."
+  active="billede"
+>
+  <div class="studio-work">
+    <section class="studio-card">
+      <div class="studio-card-head">
+        <h2>Tag eller vælg billeder</h2>
+        <p>Billederne behandles i browseren og bliver ikke sendt nogen steder, før du udgiver.</p>
+      </div>
+
+      <div id="image-camera-empty" class="studio-empty">
+        <div>
+          <p>Åbn kameraet på telefonen, eller vælg billeder fra billedmappen.</p>
+          <div class="studio-row" style="justify-content:center">
+            <button type="button" id="image-start">Åbn kamera</button>
+            <button type="button" id="image-pick" class="is-secondary">Vælg fra telefon / Google Fotos</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="image-camera-stage" hidden>
+        <div class="studio-camera">
+          <video id="image-cam" autoplay muted playsinline></video>
+        </div>
+        <div class="studio-row">
+          <button type="button" id="image-snap">Tag billede</button>
+          <button type="button" id="image-switch" class="is-secondary">Skift kamera</button>
+          <button type="button" id="image-pick-stage" class="is-secondary">Vælg billeder</button>
+          <button type="button" id="image-stop" class="is-secondary">Luk kamera</button>
+        </div>
+      </div>
+
+      <input id="image-files" type="file" accept="image/*" multiple hidden />
+      <div id="image-google-config" data-client-id={googlePhotosClientId} hidden></div>
+
+      <div class="studio-row">
+        <button type="button" id="image-google" class="is-secondary" hidden>Forbind Google Fotos</button>
+      </div>
+
+      <div id="image-drop" class="studio-drop">
+        Slip billeder her, eller indsæt dem med <kbd>Ctrl</kbd>+<kbd>V</kbd>. På telefonen åbner »Vælg fra telefon«
+        telefonens billedvælger, hvor Google Fotos også kan vælges.
+      </div>
+
+      <p id="image-status" class="studio-status" role="status"></p>
+      <div id="image-gallery" class="studio-gallery"></div>
+    </section>
+
+    <aside>
+      <StudioPublish />
+      <section class="studio-card">
+        <div class="studio-card-head">
+          <h2>Om billeder</h2>
+        </div>
+        <p class="studio-help">
+          Det første billede bliver indlæggets forsidebillede. Du kan vælge et andet med »Forside« og dreje billeder,
+          hvis telefonen har gemt dem på højkant. Billederne skaleres til max. 2000 px og gemmes som JPEG, så de er
+          hurtige at hente på mobilen.
+        </p>
+        <p class="studio-help">
+          <strong>Google Fotos direkte:</strong> Knappen »Forbind Google Fotos« vises, når der er sat en klient-id i
+          <code>site/src/data/google.ts</code>. Det kræver et Google Cloud-projekt med Photos Picker API og en
+          OAuth-webklient til bloggens adresse. Uden den virker telefonens billedvælger stadig.
+        </p>
+      </section>
+    </aside>
+  </div>
+</StudioShell>
+
+<script>
+  import '../../scripts/studio/image';
+</script>

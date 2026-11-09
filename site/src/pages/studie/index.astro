@@ -1,0 +1,63 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+
+<Base title="Opslagsstudie" noindex>
+  <div class="studio">
+    <header class="studio-head">
+      <p class="meta">Værktøjer til at lave opslag direkte i browseren</p>
+      <h1>Opslagsstudie</h1>
+      <p class="lede">
+        Optag video fra webcam, skriv og formgiv teksten, eller tag billeder med telefonen.
+        Alt kan udgives direkte til bloggen med din GitHub-forbindelse – eller hentes ned og lægges ind via skriveværktøjet.
+      </p>
+    </header>
+
+    <div class="studio-cards">
+      <a class="studio-card studio-card-link" href="/studie/video/">
+        <span class="studio-card-kicker">Video</span>
+        <h2>Optag og klip fra webcam</h2>
+        <p>Vandret til YouTube, lodret 9:16 til Instagram Reels og YouTube Shorts. Få færdige tekster til begge steder.</p>
+      </a>
+      <a class="studio-card studio-card-link" href="/studie/tekst/">
+        <span class="studio-card-kicker">Tekst</span>
+        <h2>Skriv med layoutværktøjer</h2>
+        <p>Kolonner, citatfremhævelser, skrifttyper, TLDR, udvidede detaljer og faktabokse – med live-forhåndsvisning.</p>
+      </a>
+      <a class="studio-card studio-card-link" href="/studie/billede/">
+        <span class="studio-card-kicker">Billede</span>
+        <h2>Tag billeder med telefonen</h2>
+        <p>Brug kameraet direkte, vælg fra telefonens billeder eller Google Fotos, og lav et billedopslag med det samme.</p>
+      </a>
+    </div>
+
+    <section class="studio-card">
+      <div class="studio-card-head">
+        <h2>Første gang</h2>
+        <p>Der skal kun opsættes én ting: en forbindelse til GitHub.</p>
+      </div>
+      <ol class="studio-steps">
+        <li>Lav et <strong>fine-grained token</strong> på GitHub med adgang til <code>VilladsClaes/Blog</code> og rettigheden <strong>Contents: Read and write</strong>. Det er det samme token, som skriveværktøjet bruger.</li>
+        <li>Åbn en af opslagstyperne og indsæt token'et under <em>GitHub-forbindelse</em>. Det gemmes kun i din browser.</li>
+        <li>Vælg <em>Udgiv til bloggen</em>. GitHub Actions bygger og udgiver bloggen om et par minutter.</li>
+      </ol>
+      <p class="studio-help">
+        Vil du hellere skrive i det vante CMS? Det ligger stadig på <a href="/admin/">/admin/</a>.
+        Oplæsning i din egen stemme laves med <code>npm run voice</code> – se <a href="/studie/tekst/#stemme">vejledningen under Tekst</a>.
+      </p>
+    </section>
+  </div>
+</Base>
+
+<style is:global>
+  @import '../../styles/studio.css';
+  .studio-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; margin-bottom: 1.25rem; }
+  .studio-card-link { display: block; text-decoration: none; transition: border-color 0.15s, transform 0.15s; }
+  .studio-card-link:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .studio-card-link h2 { font-size: 1.15rem; margin: 0.25rem 0 0.35rem; }
+  .studio-card-link p { margin: 0; color: var(--muted); font-size: 0.9rem; line-height: 1.55; }
+  .studio-card-kicker { font: 700 0.68rem var(--sans); text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); }
+  .studio-steps { margin: 0; padding-left: 1.2rem; font-size: 0.9rem; line-height: 1.65; }
+  .studio-steps li + li { margin-top: 0.4rem; }
+  .studio-steps code { background: var(--soft); padding: 0.05rem 0.25rem; border-radius: 3px; }
+</style>

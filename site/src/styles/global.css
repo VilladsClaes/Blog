@@ -9,6 +9,8 @@
   --mark: #ffe58a;
   --serif: 'Iowan Old Style', 'Charter', 'Georgia', 'Cambria', serif;
   --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Menlo, Consolas, monospace;
+  --hand: 'Snell Roundhand', 'Segoe Script', 'Bradley Hand', 'Comic Sans MS', cursive;
   --measure: 40rem;
   color-scheme: light;
 }
@@ -87,3 +89,84 @@ h1 { font-size: clamp(2rem, 6vw, 2.75rem); margin: 0 0 0.5rem; }
 .site-footer ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; margin: 0.5rem 0 0; }
 .site-footer a { text-decoration: none; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Opslagslayout ---------- */
+
+.post[data-font='sans'], .post[data-font='sans'] .prose { font-family: var(--sans); }
+.post[data-font='mono'], .post[data-font='mono'] .prose { font-family: var(--mono); }
+.post[data-font='haandskrift'], .post[data-font='haandskrift'] .prose { font-family: var(--hand); }
+
+.post-cover { margin: 1.6rem 0 2rem; }
+.post-cover img { display: block; width: 100%; height: auto; border-radius: 8px; }
+
+.x-tldr {
+  margin: 1.75rem 0; padding: 1.1rem 1.25rem; border-left: 4px solid var(--accent);
+  background: var(--soft); border-radius: 0 8px 8px 0; font: 0.98rem/1.6 var(--sans);
+}
+.x-tldr > :last-child { margin-bottom: 0; }
+.x-tldr p { margin-bottom: 0.5rem; }
+.x-tldr-title {
+  font: 700 0.72rem var(--sans); text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--accent); margin: 0 0 0.4rem !important;
+}
+
+.x-details {
+  margin: 1.5rem 0; padding: 0.85rem 1rem; border: 1px solid var(--line);
+  border-radius: 8px; background: var(--bg);
+}
+.x-details summary { cursor: pointer; font: 600 0.92rem var(--sans); color: var(--accent); }
+.x-details[open] summary { margin-bottom: 0.7rem; }
+.x-details > :last-child { margin-bottom: 0; }
+
+.x-columns {
+  display: grid; grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
+  gap: 1.25rem; margin: 1.75rem 0; align-items: start;
+}
+.x-column > :last-child { margin-bottom: 0; }
+@media (max-width: 640px) {
+  .x-columns { grid-template-columns: 1fr; gap: 0.5rem; }
+  .x-column { padding-bottom: 0.75rem; border-bottom: 1px solid var(--line); }
+  .x-column:last-child { border-bottom: 0; padding-bottom: 0; }
+}
+
+.x-pullquote {
+  margin: 2rem 0; padding-left: 1.25rem; border-left: 4px solid var(--accent);
+  font-family: var(--serif); font-size: 1.3rem; line-height: 1.45; font-style: italic;
+}
+.x-pullquote p { margin: 0 0 0.7rem; }
+.x-pullquote blockquote { margin: 0; border: 0; padding: 0; font: inherit; color: inherit; }
+.x-pullquote figcaption { font: 0.82rem var(--sans); font-style: normal; color: var(--muted); }
+
+.x-callout {
+  margin: 1.75rem 0; padding: 1rem 1.2rem; border: 1px solid var(--line);
+  border-radius: 10px; background: var(--soft); font: 0.98rem/1.6 var(--sans);
+}
+.x-callout-title { font-weight: 700; margin: 0 0 0.35rem !important; }
+.x-callout > :last-child { margin-bottom: 0; }
+
+.x-font-serif { font-family: var(--serif); }
+.x-font-sans { font-family: var(--sans); }
+.x-font-mono { font-family: var(--mono); font-size: 0.92em; }
+.x-font-haandskrift { font-family: var(--hand); }
+.x-font-block { margin: 1.25rem 0; padding-left: 1rem; border-left: 2px solid var(--line); }
+.x-font-block > :last-child { margin-bottom: 0; }
+
+.x-figure { margin: 1.75rem 0; }
+.x-figure img { display: block; width: 100%; height: auto; border-radius: 8px; }
+.x-figure figcaption { font: 0.85rem/1.5 var(--sans); color: var(--muted); margin-top: 0.45rem; }
+.x-wide { width: min(52rem, calc(100vw - 32px)); margin-left: 50%; transform: translateX(-50%); }
+
+.x-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 0.75rem; margin: 1.75rem 0; }
+.x-gallery img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; margin: 0; }
+
+.x-video.is-vertical .x-video-frame { aspect-ratio: 9 / 16; max-width: 420px; margin-inline: auto; }
+
+.x-voice {
+  margin: 1.5rem 0 2rem; padding: 0.9rem 1rem; border: 1px solid var(--line);
+  border-radius: 10px; background: var(--soft);
+}
+.x-voice figcaption {
+  font: 600 0.78rem var(--sans); text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--muted); margin-bottom: 0.4rem;
+}
+.x-voice audio { width: 100%; }
