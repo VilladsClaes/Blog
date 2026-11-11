@@ -1,20 +1,36 @@
 ---
-import { formatDate, type Post } from '../lib/posts';
-interface Props { posts: Post[] }
+import { formatDate, readingMinutes, tagSlug, type Post } from '../lib/posts';
+
+interface Props {
+  posts: Post[];
+}
 const { posts } = Astro.props;
 const now = new Date();
 ---
-<ul class="post-list">
-  {posts.map((p) => (
-    <li>
-      <div class="meta">
-        <time datetime={p.data.publishDate.toISOString()}>{formatDate(p.data.publishDate)}</time>
-        {p.data.archived && <span class="archived-badge">Fra arkivet</span>}
-        {p.data.draft && <span class="archived-badge">Kladde</span>}
-        {p.data.publishDate > now && <span class="archived-badge">Planlagt</span>}
+
+<ol class="post-list">
+  {posts.map((p, i) => (
+    <li class="post-row">
+      <span class="post-index" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+      <div class="post-main">
+        <div class="meta">
+          <time datetime={p.data.publishDate.toISOString()}>{formatDate(p.data.publishDate)}</time>
+          <span>{readingMinutes(p.body)} min. læsning</span>
+          {p.data.archived && <span class="badge">Arkiv</span>}
+          {p.data.draft && <span class="badge">Kladde</span>}
+          {p.data.publishDate > now && <span class="badge">Planlagt</span>}
+        </div>
+        <h2><a href={`/${p.id}/`}>{p.data.title}</a></h2>
+        {p.data.description && <p>{p.data.description}</p>}
+        {p.data.tags.length > 0 && (
+          <div class="post-foot">
+            <ul class="tags">
+              {p.data.tags.map((t) => <li><a href={`/emner/${tagSlug(t)}/`}>{t}</a></li>)}
+            </ul>
+          </div>
+        )}
       </div>
-      <h2><a href={`/${p.id}/`}>{p.data.title}</a></h2>
-      {p.data.description && <p>{p.data.description}</p>}
+      <span class="post-arrow" aria-hidden="true">↗</span>
     </li>
   ))}
-</ul>
+</ol>

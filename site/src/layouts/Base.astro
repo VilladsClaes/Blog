@@ -11,7 +11,12 @@ interface Props {
 const { title, description = 'Villads Claes skriver om at leve, lære, bygge og redde lidt af planeten – og du må gerne skrive med.', slug, noindex = false } = Astro.props;
 const fullTitle = title ? `${title} · Villads Claes` : 'Villads Claes · blog';
 const path = Astro.url.pathname;
+const isHome = path === '/';
+const isTopics = path.startsWith('/emner');
+const isSites = path.startsWith('/sites');
+const isStudio = path.startsWith('/studie');
 ---
+
 <!doctype html>
 <html lang="da">
   <head>
@@ -22,38 +27,115 @@ const path = Astro.url.pathname;
     <link rel="canonical" href={new URL(path, Astro.site)} />
     <link rel="alternate" type="application/rss+xml" title="Villads Claes · blog" href="/rss.xml" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="color-scheme" content="light dark" />
+    <meta property="og:site_name" content="Villads Claes" />
     <meta property="og:title" content={title ?? 'Villads Claes · blog'} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content={slug ? 'article' : 'website'} />
-    <meta name="theme-color" content="#fbfaf7" />
+    <meta name="theme-color" content="#f8f4ec" />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <script is:inline>
-      try { const t = localStorage.getItem('theme'); if (t) document.documentElement.dataset.theme = t; } catch {}
+      try {
+        const t = localStorage.getItem('theme');
+        if (t) document.documentElement.dataset.theme = t;
+        if (localStorage.getItem('reading-mode') === '1') document.documentElement.dataset.reading = 'comfy';
+      } catch {}
     </script>
   </head>
-  <body data-slug={slug}>
+  <body id="top" data-slug={slug}>
+    <a class="skip-link" href="#indhold">Spring til indholdet</a>
+
     <header class="site-header">
-      <div class="wrap">
-        <a class="brand" href="/">Villads Claes<span>.</span></a>
-        <nav aria-label="Hovedmenu">
-          <a href="/" aria-current={path === '/' ? 'page' : undefined}>Indlæg</a>
-          <a href="/emner/" aria-current={path.startsWith('/emner') ? 'page' : undefined}>Emner</a>
-          <a href="/sites/" aria-current={path.startsWith('/sites') ? 'page' : undefined}>Sites</a>
-          <a href="/studie/" aria-current={path.startsWith('/studie') ? 'page' : undefined}>✎ Nyt opslag</a>
-          <a href="/rss.xml">RSS</a>
+      <div class="wrap header-inner">
+        <a class="brand" href="/" aria-label="Villads Claes – forsiden">
+          <span class="brand-mark" aria-hidden="true">V</span>
+          <span class="brand-text">Villads Claes<em>.</em></span>
+        </a>
+
+        <nav class="nav" aria-label="Hovedmenu">
+          <a href="/" aria-current={isHome ? 'page' : undefined}>Indlæg</a>
+          <a href="/emner/" aria-current={isTopics ? 'page' : undefined}>Emner</a>
+          <a href="/sites/" aria-current={isSites ? 'page' : undefined}>Sites</a>
+          <a href="/studie/" class="nav-write" aria-current={isStudio ? 'page' : undefined}>Skriv</a>
         </nav>
+
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Skift tema" title="Skift mellem lyst og mørkt tema">
+          <svg class="theme-icon moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z" />
+          </svg>
+          <svg class="theme-icon sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="3.5" />
+            <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4" />
+          </svg>
+        </button>
       </div>
     </header>
-    <main class="wrap">
+
+    <main class="wrap" id="indhold">
       <slot />
     </main>
+
     <footer class="site-footer">
       <div class="wrap">
-        <div>© {new Date().getFullYear()} Villads Claes · Læsere må gerne understrege, kommentere og tegne på siderne.</div>
-        <ul>
-          {sites.map((s) => <li><a href={s.url}>{s.name}</a></li>)}
-        </ul>
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <a class="brand" href="/" aria-label="Villads Claes – forsiden">
+              <span class="brand-mark" aria-hidden="true">V</span>
+              <span class="brand-text">Villads Claes<em>.</em></span>
+            </a>
+            <p class="footer-note">En blog om at leve, lære, bygge ting og redde lidt af planeten. Læserne må gerne understrege, kommentere og tegne på siderne.</p>
+          </div>
+
+          <div class="footer-col">
+            <h2>Læs</h2>
+            <ul>
+              <li><a href="/">Alle indlæg</a></li>
+              <li><a href="/emner/">Emner</a></li>
+              <li><a href="/sites/">Sites</a></li>
+              <li><a href="/rss.xml">RSS-feed</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h2>Projekter</h2>
+            <ul>
+              {sites.slice(0, 5).map((s) => <li><a href={s.url}>{s.name}</a></li>)}
+              <li><a href="/sites/">Alle sites →</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <span>© {new Date().getFullYear()} Villads Claes</span>
+          <span>Skrevet i Markdown. Bygget med Astro.</span>
+          <a href="#top">Til toppen ↑</a>
+        </div>
       </div>
     </footer>
+
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+        const toggle = document.querySelector('[data-theme-toggle]');
+        const header = document.querySelector('.site-header');
+        if (!toggle) return;
+        const media = window.matchMedia('(prefers-color-scheme: dark)');
+        const isDark = () => root.dataset.theme ? root.dataset.theme === 'dark' : media.matches;
+        const sync = () => toggle.setAttribute('aria-label', isDark() ? 'Skift til lyst tema' : 'Skift til mørkt tema');
+        const syncHeader = () => {
+          if (header) root.style.setProperty('--header-h', `${header.offsetHeight}px`);
+        };
+        sync();
+        syncHeader();
+        toggle.addEventListener('click', () => {
+          const next = isDark() ? 'light' : 'dark';
+          root.dataset.theme = next;
+          try { localStorage.setItem('theme', next); } catch {}
+          sync();
+        });
+        media.addEventListener?.('change', sync);
+        window.addEventListener('resize', syncHeader);
+      })();
+    </script>
   </body>
 </html>

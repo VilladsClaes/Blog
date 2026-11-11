@@ -20,19 +20,29 @@ const d = post.data;
 const linkedSites = d.sites.map(siteByKey).filter((s) => s !== undefined);
 const features = Object.entries(d.interactive).filter(([, on]) => on).map(([k]) => k).join(' ');
 ---
+
 <Base title={d.title} description={d.description} slug={post.id}>
+  <div class="reading-progress" aria-hidden="true"><span data-reading-progress></span></div>
+
   <article class="post" data-features={features} data-font={d.font}>
-    <header>
+    <header class="post-header">
       <div class="meta">
         <time datetime={d.publishDate.toISOString()}>{formatDate(d.publishDate)}</time>
-        <span>{readingMinutes(post.body)} min.</span>
-        {d.archived && <span class="archived-badge">Fra arkivet</span>}
+        <span>{readingMinutes(post.body)} min. læsning</span>
+        {d.updated && <span>Opdateret {formatDate(d.updated)}</span>}
+        {d.archived && <span class="badge">Fra arkivet</span>}
       </div>
       <h1>{d.title}</h1>
       {d.description && <p class="lede">{d.description}</p>}
       {d.tags.length > 0 && (
         <ul class="tags">{d.tags.map((t) => <li><a href={`/emner/${tagSlug(t)}/`}>{t}</a></li>)}</ul>
       )}
+      <div class="post-controls sans">
+        <button class="reading-toggle" type="button" data-reading-toggle aria-pressed="false" title="Større tekst og mere luft" hidden>
+          <span class="reading-toggle-mark" aria-hidden="true">Aa</span>
+          <span data-reading-label>Rolig læsning</span>
+        </button>
+      </div>
     </header>
 
     {d.cover && (
@@ -40,8 +50,6 @@ const features = Object.entries(d.interactive).filter(([, on]) => on).map(([k]) 
         <img src={d.cover} alt="" loading="eager" decoding="async" fetchpriority="high" />
       </figure>
     )}
-
-    <div class="x-tools sans" role="toolbar" aria-label="Værktøjer til indlægget" hidden></div>
 
     {d.tldr && (
       <aside class="x-tldr">
@@ -62,6 +70,8 @@ const features = Object.entries(d.interactive).filter(([, on]) => on).map(([k]) 
         <Fragment set:html={videoHtml(d.video, d.videoFormat)} />
       </div>
     )}
+
+    <div class="x-tools sans" role="toolbar" aria-label="Værktøjer til indlægget" hidden></div>
 
     <div class="prose" id="prose">
       <Content />
@@ -96,11 +106,24 @@ const features = Object.entries(d.interactive).filter(([, on]) => on).map(([k]) 
       </section>
     )}
 
-    <nav class="related" aria-label="Flere indlæg">
-      <ul style="list-style:none;padding:0;display:flex;justify-content:space-between;gap:1rem">
-        <li>{older && <a href={`/${older.id}/`}>← {older.data.title}</a>}</li>
-        <li style="text-align:right">{newer && <a href={`/${newer.id}/`}>{newer.data.title} →</a>}</li>
-      </ul>
+    <footer class="post-end">
+      <p>Tak, fordi du læste med.</p>
+      <a href="#top">Til toppen ↑</a>
+    </footer>
+
+    <nav class="post-nav" aria-label="Flere indlæg">
+      {older && (
+        <a class="post-nav-item" href={`/${older.id}/`}>
+          <span>← Ældre</span>
+          <strong>{older.data.title}</strong>
+        </a>
+      )}
+      {newer && (
+        <a class="post-nav-item post-nav-next" href={`/${newer.id}/`}>
+          <span>Nyere →</span>
+          <strong>{newer.data.title}</strong>
+        </a>
+      )}
     </nav>
   </article>
 </Base>
@@ -108,6 +131,57 @@ const features = Object.entries(d.interactive).filter(([, on]) => on).map(([k]) 
 <script>
   import '../scripts/interactive';
 </script>
+
+<script>
+  const progress = document.querySelector<HTMLElement>('[data-reading-progress]');
+  const article = document.querySelector<HTMLElement>('article.post');
+
+  if (progress && article) {
+    let frame = 0;
+
+    const update = () => {
+      frame = 0;
+      const top = article.getBoundingClientRect().top + window.scrollY;
+      const distance = article.offsetHeight - window.innerHeight;
+      const value = distance > 0 ? (window.scrollY - top) / distance : 0;
+      progress.style.transform = `scaleX(${Math.min(1, Math.max(0, value))})`;
+    };
+
+    const request = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener('scroll', request, { passive: true });
+    window.addEventListener('resize', request);
+  }
+
+  const readingToggle = document.querySelector<HTMLButtonElement>('[data-reading-toggle]');
+
+  if (readingToggle) {
+    const label = readingToggle.querySelector<HTMLElement>('[data-reading-label]');
+    let calm = document.documentElement.dataset.reading === 'comfy';
+
+    const applyReadingMode = (on: boolean) => {
+      document.documentElement.dataset.reading = on ? 'comfy' : '';
+      readingToggle.setAttribute('aria-pressed', String(on));
+      if (label) label.textContent = on ? 'Normal visning' : 'Rolig læsning';
+    };
+
+    applyReadingMode(calm);
+    readingToggle.hidden = false;
+
+    readingToggle.addEventListener('click', () => {
+      calm = !calm;
+      applyReadingMode(calm);
+      try {
+        if (calm) localStorage.setItem('reading-mode', '1');
+        else localStorage.removeItem('reading-mode');
+      } catch {}
+    });
+  }
+</script>
+
 <style is:global>
   @import '../styles/interactive.css';
 </style>

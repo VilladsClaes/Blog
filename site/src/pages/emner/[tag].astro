@@ -13,8 +13,14 @@ export async function getStaticPaths() {
 }
 const { tag, posts } = Astro.props;
 ---
+
 <Base title={tag}>
-  <p class="meta"><a href="/emner/">Emner</a></p>
-  <h1>{tag}</h1>
+  <header class="page-head">
+    <p class="back-link"><a href="/emner/">← Alle emner</a></p>
+    <p class="eyebrow">Emne</p>
+    <h1>{tag}</h1>
+    <p class="lede">{posts.length} {posts.length === 1 ? 'tekst' : 'tekster'} i dette emne.</p>
+  </header>
+
   <PostList posts={posts} />
 </Base>

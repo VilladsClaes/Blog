@@ -1,8 +1,16 @@
 ---
 import Base from '../layouts/Base.astro';
 ---
+
 <Base title="Siden findes ikke">
-  <h1>Hov – her er tomt</h1>
-  <p class="lede">Siden findes ikke (længere). Måske er den flyttet, da bloggen blev bygget om.</p>
-  <p><a href="/">Gå til forsiden</a></p>
+  <section class="error-page">
+    <p class="error-code" aria-hidden="true">404</p>
+    <p class="eyebrow">Her er tomt</p>
+    <h1>Denne side findes ikke.</h1>
+    <p class="lede">Måske er den flyttet, da bloggen blev bygget om. Du kan gå tilbage til forsiden – eller finde et emne, der er værd at blive hængende i.</p>
+    <div class="hero-actions">
+      <a class="button" href="/">Til forsiden</a>
+      <a class="button button-ghost" href="/emner/">Find et emne</a>
+    </div>
+  </section>
 </Base>

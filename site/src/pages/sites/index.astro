@@ -4,19 +4,25 @@ import { sites } from '../../data/sites';
 import { getPublishedPosts } from '../../lib/posts';
 const posts = await getPublishedPosts();
 ---
+
 <Base title="Sites" description="Mine andre websites og de indlæg, der hører til dem.">
-  <h1>Sites</h1>
-  <p class="lede">Indlæg på bloggen kan høre til mine andre projekter. Her er de.</p>
-  <ul class="post-list">
+  <header class="page-head">
+    <p class="eyebrow">Andre steder</p>
+    <h1>Sites</h1>
+    <p class="lede">Indlæg på bloggen kan høre til mine andre projekter. Her er de – og de tekster, der hører til hvert sted.</p>
+  </header>
+
+  <div class="site-grid">
     {sites.map((s) => {
       const n = posts.filter((p) => p.data.sites.includes(s.key)).length;
       return (
-        <li>
-          <div class="meta"><a href={s.url}>{s.url.replace('https://', '')}</a><span>{n} indlæg</span></div>
-          <h2><a href={`/sites/${s.key}/`}>{s.name}</a></h2>
+        <a class="site-card" href={`/sites/${s.key}/`}>
+          <span class="site-kicker">{n} indlæg</span>
+          <h2>{s.name}</h2>
           <p>{s.description}</p>
-        </li>
+          <span class="site-url">{s.url.replace('https://', '')} <span aria-hidden="true">↗</span></span>
+        </a>
       );
     })}
-  </ul>
+  </div>
 </Base>

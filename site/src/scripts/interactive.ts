@@ -68,6 +68,7 @@ function renderPolls() {
     box.dataset.noAnchor = '';
     const id = box.dataset.poll!;
     const options: string[] = JSON.parse(box.dataset.options ?? '[]');
+    const opinion = box.classList.contains('x-opinion');
     const data = state.polls[id] ?? { counts: {}, mine: null };
     const t = total(data.counts);
     const answered = data.mine !== null;
@@ -90,7 +91,10 @@ function renderPolls() {
       }, h('span', {}, label), answered ? h('span', { class: 'x-num' }, `${pct(n, t)} %`) : null);
       list.append(btn);
     });
-    list.append(h('p', { class: 'x-small' }, answered ? `${t} ${t === 1 ? 'stemme' : 'stemmer'} · du kan skifte mening` : online ? 'Stem for at se resultatet' : 'Afstemningen er midlertidigt lukket'));
+    const unit = opinion ? 'svar' : t === 1 ? 'stemme' : 'stemmer';
+    const waiting = opinion ? 'Svar for at se resultatet' : 'Stem for at se resultatet';
+    const closed = opinion ? 'Spørgsmålet er midlertidigt lukket' : 'Afstemningen er midlertidigt lukket';
+    list.append(h('p', { class: 'x-small' }, answered ? `${t} ${unit} · du kan skifte mening` : online ? waiting : closed));
     box.append(list);
   }
 }
@@ -602,7 +606,9 @@ async function init() {
     state = await api<State>(`/state?voter=${voter}`);
   } catch {
     online = false;
-    tools.append(h('span', { class: 'x-hint' }, 'De interaktive funktioner er offline lige nu.'));
+    const hint = tools.querySelector<HTMLElement>('.x-hint');
+    if (hint) hint.textContent = 'De interaktive funktioner er offline lige nu.';
+    else tools.append(h('span', { class: 'x-hint' }, 'De interaktive funktioner er offline lige nu.'));
   }
   renderPolls();
   renderStances();

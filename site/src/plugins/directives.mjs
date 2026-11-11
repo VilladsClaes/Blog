@@ -1,6 +1,7 @@
 // Gør det let at skrive interaktive elementer og layout direkte i Markdown – også fra mobilen:
 //
 //   ::afstemning[Skal jeg flytte på landet?]{valg="Ja|Nej|Ved ikke"}
+//   ::spoergsmaal[Ville du gøre det samme?]{valg="Ja|Nej|Måske"}
 //   ::holdning[Skolen bør afskaffe karakterer]
 //   ::video[Valgfri billedtekst]{src="https://youtu.be/abc123" format="lodret"}
 //   ::billede[Billedtekst]{src="/media/..." alt="Beskrivelse" bred}
@@ -91,6 +92,13 @@ const handlers = {
     const statement = text(node).trim();
     const id = attr(node, 'id') || slugify(statement);
     return el('div', { className: ['x-stance'], dataStance: id }, [el('p', { className: ['x-stance-q'] }, [t(statement)])]);
+  },
+  spoergsmaal(node) {
+    const base = handlers.afstemning(node);
+    if (!base) return null;
+    base.properties.className = ['x-poll', 'x-opinion'];
+    base.children.unshift(el('p', { className: ['x-opinion-kicker'] }, [t('Hvad tænker du?')]));
+    return base;
   },
   video(node) {
     const src = attr(node, 'src');
@@ -200,6 +208,8 @@ const handlers = {
 };
 
 handlers.poll = handlers.afstemning;
+handlers.question = handlers.spoergsmaal;
+handlers.opinion = handlers.spoergsmaal;
 handlers.stance = handlers.holdning;
 handlers.summary = handlers.tldr;
 handlers.resume = handlers.tldr;

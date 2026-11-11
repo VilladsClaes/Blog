@@ -106,6 +106,12 @@ Skriv dem på deres egen linje:
 ::video[Valgfri billedtekst]{src="https://youtu.be/abc123"}
 ```
 
+Et `::spoergsmaal` er et kortere holdningsspørgsmål med faste svarmuligheder. Det bruger samme tælling som en afstemning, men rammen er mere samtalende – god til spørgsmål, der hører tæt sammen med teksten:
+
+```md
+::spoergsmaal[Ville du gøre det samme i den situation?]{valg="Jeg ville nok spørge vedkommende først|Jeg ville gøre præcis det samme som kloge Villads|Jeg har aldrig tænkt over det før"}
+```
+
 Og midt i en sætning: `Det her er :vigtigt[rigtig vigtigt].`
 
 Understregninger, noter, graffiti, oplæsning og besyv er slået til på alle indlæg. De kan slås fra pr. indlæg under *Interaktive funktioner*.
