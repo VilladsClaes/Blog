@@ -163,7 +163,8 @@ void MapDelete<T>(string route, Func<BlogDb, DbSet<T>> set) where T : PostItem =
     {
         var item = await set(db).FirstOrDefaultAsync(x => x.Id == id && x.Post == slug);
         if (item is null) return Results.NotFound();
-        if (item.Voter != voter && !IsAdmin(req)) return Results.Forbid();
+        // Ikke Results.Forbid(): den kræver et authentication-scheme og giver 500 her.
+        if (item.Voter != voter && !IsAdmin(req)) return Results.StatusCode(StatusCodes.Status403Forbidden);
         set(db).Remove(item);
         await db.SaveChangesAsync();
         return Results.NoContent();
@@ -176,7 +177,7 @@ api.MapDelete("/polls/{pollId}", async (string slug, string pollId, string? vote
 {
     if (!ValidPost(slug) || !ValidId(pollId)) return Results.BadRequest();
     var admin = IsAdmin(req);
-    if (!admin && !ValidVoter(voter)) return Results.Forbid();
+    if (!admin && !ValidVoter(voter)) return Results.StatusCode(StatusCodes.Status403Forbidden);
     var query = db.Votes.Where(v => v.Post == slug && v.PollId == pollId);
     if (!admin) query = query.Where(v => v.Voter == voter);
     var rows = await query.ToListAsync();
@@ -190,7 +191,7 @@ api.MapDelete("/stances/{stanceId}", async (string slug, string stanceId, string
 {
     if (!ValidPost(slug) || !ValidId(stanceId)) return Results.BadRequest();
     var admin = IsAdmin(req);
-    if (!admin && !ValidVoter(voter)) return Results.Forbid();
+    if (!admin && !ValidVoter(voter)) return Results.StatusCode(StatusCodes.Status403Forbidden);
     var query = db.Stances.Where(s => s.Post == slug && s.StanceId == stanceId);
     if (!admin) query = query.Where(s => s.Voter == voter);
     var rows = await query.ToListAsync();
