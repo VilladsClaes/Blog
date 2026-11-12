@@ -171,15 +171,17 @@ void MapDelete<T>(string route, Func<BlogDb, DbSet<T>> set) where T : PostItem =
     }).RequireRateLimiting("skriv");
 
 // Afstemninger og holdninger har ét svar pr. læser, så de slettes via spørgsmålets id
-// i stedet for rækkens: læseren kan trække sit eget svar tilbage med ?voter=…, og med
-// X-Admin-Key ryddes alle svar på spørgsmålet (fx teststemmer eller upassende svar).
+// i stedet for rækkens: med ?voter=… fjernes netop det svar (admin eller læseren selv),
+// og uden voter rydder X-Admin-Key alle svar på spørgsmålet.
 api.MapDelete("/polls/{pollId}", async (string slug, string pollId, string? voter, HttpRequest req, BlogDb db) =>
 {
     if (!ValidPost(slug) || !ValidId(pollId)) return Results.BadRequest();
     var admin = IsAdmin(req);
-    if (!admin && !ValidVoter(voter)) return Results.StatusCode(StatusCodes.Status403Forbidden);
+    // Med ?voter= fjernes kun den ene stemme (admin eller læseren selv); uden voter rydder admin alle.
+    if (voter is not null && !ValidVoter(voter)) return Results.BadRequest();
+    if (voter is null && !admin) return Results.StatusCode(StatusCodes.Status403Forbidden);
     var query = db.Votes.Where(v => v.Post == slug && v.PollId == pollId);
-    if (!admin) query = query.Where(v => v.Voter == voter);
+    if (voter is not null) query = query.Where(v => v.Voter == voter);
     var rows = await query.ToListAsync();
     if (rows.Count == 0) return Results.NotFound();
     db.Votes.RemoveRange(rows);
@@ -191,9 +193,11 @@ api.MapDelete("/stances/{stanceId}", async (string slug, string stanceId, string
 {
     if (!ValidPost(slug) || !ValidId(stanceId)) return Results.BadRequest();
     var admin = IsAdmin(req);
-    if (!admin && !ValidVoter(voter)) return Results.StatusCode(StatusCodes.Status403Forbidden);
+    // Med ?voter= fjernes kun det ene svar (admin eller læseren selv); uden voter rydder admin alle.
+    if (voter is not null && !ValidVoter(voter)) return Results.BadRequest();
+    if (voter is null && !admin) return Results.StatusCode(StatusCodes.Status403Forbidden);
     var query = db.Stances.Where(s => s.Post == slug && s.StanceId == stanceId);
-    if (!admin) query = query.Where(s => s.Voter == voter);
+    if (voter is not null) query = query.Where(s => s.Voter == voter);
     var rows = await query.ToListAsync();
     if (rows.Count == 0) return Results.NotFound();
     db.Stances.RemoveRange(rows);

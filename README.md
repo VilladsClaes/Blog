@@ -180,11 +180,14 @@ curl -X DELETE -H "X-Admin-Key: …" https://blog.villadsclaes.dk/api/posts/<slu
 
 Samme for `annotations` og `strokes`. Læsere kan selv slette deres egne bidrag.
 
-Stemmer og holdninger har ét svar pr. læser, så de ryddes via spørgsmålets id – her slettes **alle** svar på spørgsmålet:
+Stemmer og holdninger har ét svar pr. læser, så de slettes via spørgsmålets id. `voter`-id'et står i `/api/admin/seneste`.
 
 ```bash
+# kun én bestemt stemme
+curl -X DELETE -H "X-Admin-Key: …" "https://blog.villadsclaes.dk/api/posts/<slug>/polls/<pollId>?voter=<id>"
+
+# alle svar på spørgsmålet
 curl -X DELETE -H "X-Admin-Key: …" https://blog.villadsclaes.dk/api/posts/<slug>/polls/<pollId>
-curl -X DELETE -H "X-Admin-Key: …" https://blog.villadsclaes.dk/api/posts/<slug>/stances/<stanceId>
 ```
 
-Uden `X-Admin-Key` kan en læser trække sit eget svar tilbage med `?voter=<id>`.
+Samme for `/stances/<stanceId>`. Uden `X-Admin-Key` kan en læser kun trække sit eget svar tilbage og skal derfor sende `?voter=<id>`.
