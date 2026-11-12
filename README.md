@@ -179,3 +179,12 @@ curl -X DELETE -H "X-Admin-Key: …" https://blog.villadsclaes.dk/api/posts/<slu
 ```
 
 Samme for `annotations` og `strokes`. Læsere kan selv slette deres egne bidrag.
+
+Stemmer og holdninger har ét svar pr. læser, så de ryddes via spørgsmålets id – her slettes **alle** svar på spørgsmålet:
+
+```bash
+curl -X DELETE -H "X-Admin-Key: …" https://blog.villadsclaes.dk/api/posts/<slug>/polls/<pollId>
+curl -X DELETE -H "X-Admin-Key: …" https://blog.villadsclaes.dk/api/posts/<slug>/stances/<stanceId>
+```
+
+Uden `X-Admin-Key` kan en læser trække sit eget svar tilbage med `?voter=<id>`.

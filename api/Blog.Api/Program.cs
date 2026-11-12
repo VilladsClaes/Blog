@@ -169,6 +169,37 @@ void MapDelete<T>(string route, Func<BlogDb, DbSet<T>> set) where T : PostItem =
         return Results.NoContent();
     }).RequireRateLimiting("skriv");
 
+// Afstemninger og holdninger har ét svar pr. læser, så de slettes via spørgsmålets id
+// i stedet for rækkens: læseren kan trække sit eget svar tilbage med ?voter=…, og med
+// X-Admin-Key ryddes alle svar på spørgsmålet (fx teststemmer eller upassende svar).
+api.MapDelete("/polls/{pollId}", async (string slug, string pollId, string? voter, HttpRequest req, BlogDb db) =>
+{
+    if (!ValidPost(slug) || !ValidId(pollId)) return Results.BadRequest();
+    var admin = IsAdmin(req);
+    if (!admin && !ValidVoter(voter)) return Results.Forbid();
+    var query = db.Votes.Where(v => v.Post == slug && v.PollId == pollId);
+    if (!admin) query = query.Where(v => v.Voter == voter);
+    var rows = await query.ToListAsync();
+    if (rows.Count == 0) return Results.NotFound();
+    db.Votes.RemoveRange(rows);
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+}).RequireRateLimiting("skriv");
+
+api.MapDelete("/stances/{stanceId}", async (string slug, string stanceId, string? voter, HttpRequest req, BlogDb db) =>
+{
+    if (!ValidPost(slug) || !ValidId(stanceId)) return Results.BadRequest();
+    var admin = IsAdmin(req);
+    if (!admin && !ValidVoter(voter)) return Results.Forbid();
+    var query = db.Stances.Where(s => s.Post == slug && s.StanceId == stanceId);
+    if (!admin) query = query.Where(s => s.Voter == voter);
+    var rows = await query.ToListAsync();
+    if (rows.Count == 0) return Results.NotFound();
+    db.Stances.RemoveRange(rows);
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+}).RequireRateLimiting("skriv");
+
 // Overblik til moderation: GET /api/admin/seneste med headeren X-Admin-Key.
 app.MapGet("/api/admin/seneste", async (HttpRequest req, BlogDb db) =>
 {
