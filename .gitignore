@@ -11,3 +11,4 @@ api/Blog.Api/wwwroot/*
 appsettings.*.local.json
 publish/
 .vs/
+.secrets/
