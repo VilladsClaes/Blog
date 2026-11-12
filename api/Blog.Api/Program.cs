@@ -210,6 +210,8 @@ app.MapGet("/api/admin/seneste", async (HttpRequest req, BlogDb db) =>
         comments = await db.Comments.OrderByDescending(x => x.CreatedAt).Take(100).ToListAsync(),
         annotations = await db.Annotations.OrderByDescending(x => x.CreatedAt).Take(100).ToListAsync(),
         strokes = await db.Strokes.OrderByDescending(x => x.CreatedAt).Take(100).Select(x => new { x.Id, x.Post, x.Color, x.CreatedAt }).ToListAsync(),
+        votes = await db.Votes.OrderByDescending(x => x.CreatedAt).Take(100).Select(x => new { x.Id, x.Post, x.PollId, x.Option, x.Voter, x.CreatedAt }).ToListAsync(),
+        stances = await db.Stances.OrderByDescending(x => x.CreatedAt).Take(100).Select(x => new { x.Id, x.Post, x.StanceId, x.Value, x.Voter, x.CreatedAt }).ToListAsync(),
     });
 });
 

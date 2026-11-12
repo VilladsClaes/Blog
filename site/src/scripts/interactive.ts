@@ -95,6 +95,18 @@ function renderPolls() {
     const waiting = opinion ? 'Svar for at se resultatet' : 'Stem for at se resultatet';
     const closed = opinion ? 'Spørgsmålet er midlertidigt lukket' : 'Afstemningen er midlertidigt lukket';
     list.append(h('p', { class: 'x-small' }, answered ? `${t} ${unit} · du kan skifte mening` : online ? waiting : closed));
+    if (answered) {
+      list.append(h('p', { class: 'x-small' }, h('button', {
+        type: 'button', class: 'x-link',
+        onclick: async () => {
+          try {
+            await remove(`/polls/${encodeURIComponent(id)}`);
+            state.polls = Object.fromEntries(Object.entries(state.polls).filter(([key]) => key !== id));
+            renderPolls();
+          } catch (e) { toast((e as Error).message); }
+        },
+      }, 'fortryd dit svar')));
+    }
     box.append(list);
   }
 }
