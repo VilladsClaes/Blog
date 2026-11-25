@@ -1,8 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { sites } from '../../data/sites';
-import { getPublishedPosts } from '../../lib/posts';
-const posts = await getPublishedPosts();
 ---
 
 <Base title="Sites" description="Mine andre websites og de indlæg, der hører til dem.">
@@ -13,16 +11,15 @@ const posts = await getPublishedPosts();
   </header>
 
   <div class="site-grid">
-    {sites.map((s) => {
-      const n = posts.filter((p) => p.data.sites.includes(s.key)).length;
-      return (
-        <a class="site-card" href={`/sites/${s.key}/`}>
-          <span class="site-kicker">{n} indlæg</span>
-          <h2>{s.name}</h2>
-          <p>{s.description}</p>
-          <span class="site-url">{s.url.replace('https://', '')} <span aria-hidden="true">↗</span></span>
-        </a>
-      );
-    })}
+    {sites.map((s) => (
+      <a class="site-card" href={`/sites/${s.key}/`}>
+        <span class="site-kicker"><span data-site-count={s.key}>0</span> indlæg</span>
+        <h2>{s.name}</h2>
+        <p>{s.description}</p>
+        <span class="site-url">{s.url.replace('https://', '')} <span aria-hidden="true">↗</span></span>
+      </a>
+    ))}
   </div>
+
+  <div data-db-sites hidden></div>
 </Base>

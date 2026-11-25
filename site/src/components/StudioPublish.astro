@@ -3,7 +3,7 @@
 ---
 <section class="studio-card studio-publish" aria-labelledby="pub-heading">
   <div class="studio-card-head">
-    <h2 id="pub-heading">Udgiv opslaget</h2>
+    <h2 id="pub-heading">Gem opslaget</h2>
     <p>Udfyld det, der skal stå øverst i indlægget. Adressen laves automatisk ud fra titlen, men kan ændres.</p>
   </div>
 
@@ -52,12 +52,13 @@
   </div>
 
   <div class="studio-row studio-actions">
-    <button type="button" id="pub-go">Udgiv til bloggen</button>
+    <button type="button" id="pub-go">Gem i databasen</button>
     <button type="button" id="pub-copy" class="is-secondary">Kopiér Markdown</button>
+    <button type="button" id="pub-preview" class="is-secondary" hidden>Kopiér preview-link</button>
   </div>
   <p id="pub-status" class="studio-status" role="status"></p>
   <p class="studio-help">
-    Med GitHub-forbindelsen ovenfor committes indlægget direkte til repoet, og GitHub Actions bygger bloggen om et par minutter.
-    Uden token kan du hente mediet her og kopiere Markdown til skriveværktøjet på <a href="/admin/">/admin/</a>.
+    Med admin-adgangen ovenfor gemmes indlægget direkte i bloggens database. Kladder og planlagte indlæg kan deles
+    med et midlertidigt preview-link, og du kan altid fortsætte redigeringen i <a href="/admin/">/admin/</a>.
   </p>
 </section>

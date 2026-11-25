@@ -1,17 +1,5 @@
 ---
 import Base from '../layouts/Base.astro';
-import PostList from '../components/PostList.astro';
-import { getPublishedPosts, formatDate, readingMinutes, tagSlug } from '../lib/posts';
-
-const posts = await getPublishedPosts();
-const featured = posts.find((p) => !p.data.archived) ?? posts[0];
-const rest = featured ? posts.filter((p) => p.id !== featured.id) : posts;
-
-const counts = new Map<string, number>();
-for (const p of posts) for (const t of p.data.tags) counts.set(t, (counts.get(t) ?? 0) + 1);
-const topics = [...counts]
-  .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'da'))
-  .slice(0, 9);
 ---
 
 <Base>
@@ -25,54 +13,7 @@ const topics = [...counts]
     </div>
   </section>
 
-  {featured && (
-    <a class="featured" href={`/${featured.id}/`}>
-      <div class="featured-body">
-        <p class="eyebrow">Seneste</p>
-        <div class="meta">
-          <time datetime={featured.data.publishDate.toISOString()}>{formatDate(featured.data.publishDate)}</time>
-          <span>{readingMinutes(featured.body)} min. læsning</span>
-        </div>
-        <h2>{featured.data.title}</h2>
-        {featured.data.description && <p>{featured.data.description}</p>}
-        <span class="featured-cta">Læs teksten <span aria-hidden="true">→</span></span>
-      </div>
-      <div class="featured-art" aria-hidden="true">
-        {featured.data.cover ? (
-          <img src={featured.data.cover} alt="" loading="eager" />
-        ) : (
-          <span class="featured-number">01</span>
-        )}
-      </div>
-    </a>
-  )}
-
-  <section class="section" id="alle-indlaeg">
-    <div class="section-head">
-      <h2>Alle indlæg</h2>
-      <span>{posts.length} {posts.length === 1 ? 'tekst' : 'tekster'}</span>
-    </div>
-    {rest.length > 0 ? <PostList posts={rest} /> : <p class="empty-state">Der er ikke flere indlæg endnu.</p>}
-  </section>
-
-  {topics.length > 0 && (
-    <section class="section topic-section">
-      <div class="section-head">
-        <h2>Læs efter emne</h2>
-        <a href="/emner/">Alle emner →</a>
-      </div>
-      <ul class="topic-cloud">
-        {topics.map(([tag, n]) => (
-          <li>
-            <a href={`/emner/${tagSlug(tag)}/`}>
-              {tag}
-              <span class="count">{n}</span>
-            </a>
-          </li>
-        ))}
-      </ul>
-    </section>
-  )}
+  <div data-db-posts hidden></div>
 
   <section class="home-about">
     <p class="eyebrow">Om bloggen</p>

@@ -33,30 +33,22 @@ const tabs = [
     </header>
 
     <details class="studio-settings">
-      <summary>GitHub-forbindelse <span class="studio-summary-note">– kun nødvendig for at udgive direkte</span></summary>
-      <div class="studio-fields studio-fields-3">
+      <summary>Admin-adgang <span class="studio-summary-note">– nødvendig for at gemme i databasen</span></summary>
+      <div class="studio-fields">
         <label>
-          GitHub-token
-          <input id="gh-token" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…" />
-        </label>
-        <label>
-          Repository
-          <input id="gh-repo" value="VilladsClaes/Blog" spellcheck="false" />
-        </label>
-        <label>
-          Gren
-          <input id="gh-branch" value="main" spellcheck="false" />
+          Admin-nøgle
+          <input id="api-key" type="password" autocomplete="off" spellcheck="false" placeholder="X-Admin-Key" />
         </label>
       </div>
       <div class="studio-row">
-        <button type="button" id="gh-save">Gem i denne browser</button>
-        <button type="button" id="gh-test" class="is-secondary">Test forbindelse</button>
-        <button type="button" id="gh-forget" class="is-link">Glem token</button>
+        <button type="button" id="api-save">Gem i denne fane</button>
+        <button type="button" id="api-test" class="is-secondary">Test forbindelse</button>
+        <button type="button" id="api-forget" class="is-link">Glem nøglen</button>
       </div>
-      <p id="gh-status" class="studio-status" role="status"></p>
+      <p id="api-status" class="studio-status" role="status"></p>
       <p class="studio-help">
-        Brug det samme fine-grained token som til skriveværktøjet, med <strong>Contents: Read and write</strong> til
-        <code>VilladsClaes/Blog</code>. Token'et gemmes kun i denne browser og sendes direkte til GitHub – aldrig til bloggens server.
+        Brug den samme admin-nøgle som i <a href="/admin/">skriveværktøjet</a>. Nøglen gemmes kun i denne fane og
+        sendes til bloggens eget API – ikke til GitHub eller andre tjenester.
       </p>
     </details>
 

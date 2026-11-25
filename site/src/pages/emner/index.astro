@@ -1,11 +1,5 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { getPublishedPosts, tagSlug } from '../../lib/posts';
-
-const posts = await getPublishedPosts();
-const counts = new Map<string, number>();
-for (const p of posts) for (const t of p.data.tags) counts.set(t, (counts.get(t) ?? 0) + 1);
-const tags = [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'da'));
 ---
 
 <Base title="Emner" description="Find indlæg efter emne – fra selvindsigt og teknologi til skole, tid og bæredygtighed.">
@@ -15,14 +9,5 @@ const tags = [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 
     <p class="lede">Bloggen bevæger sig mellem det personlige, det pædagogiske og det teknologiske. Vælg et emne, og se hvad der gemmer sig.</p>
   </header>
 
-  <ul class="topic-cloud topic-cloud-large">
-    {tags.map(([t, n]) => (
-      <li>
-        <a href={`/emner/${tagSlug(t)}/`}>
-          {t}
-          <span class="count">{n}</span>
-        </a>
-      </li>
-    ))}
-  </ul>
+  <div data-db-topics hidden></div>
 </Base>

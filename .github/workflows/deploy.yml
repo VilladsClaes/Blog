@@ -1,9 +1,10 @@
 name: Byg og udgiv bloggen
 
 # Push til main      => byg og udgiv (API'et kun hvis koden i api/ er ændret)
-# Hver time          => udgiv, hvis et planlagt indlæg er blevet modent
 # Pull requests      => byg kun
 # Manuelt            => udgiv alt (vælg "full" for også at udgive API'et)
+#
+# Indholdet ligger i databasen og kræver ingen workflow-kørsel.
 #
 # Kræver repository secrets (Settings → Secrets and variables → Actions):
 #   FTP_SERVER, FTP_USERNAME, FTP_PASSWORD   samme FTP-login som dine andre Simply-sites
@@ -15,8 +16,6 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
-  schedule:
-    - cron: '7 * * * *'
   workflow_dispatch:
     inputs:
       full:
@@ -47,24 +46,16 @@ jobs:
           cache: npm
           cache-dependency-path: site/package-lock.json
 
-      - name: Er der planlagte indlæg, der skal ud nu?
-        id: due
-        if: github.event_name == 'schedule'
-        working-directory: site
-        run: node scripts/due-posts.mjs
-
       - name: Hvad skal udgives?
         id: plan
         env:
           EVENT: ${{ github.event_name }}
-          DUE: ${{ steps.due.outputs.due }}
           FULL: ${{ inputs.full }}
           BEFORE: ${{ github.event.before }}
           HAS_FTP: ${{ secrets.FTP_SERVER != '' }}
         run: |
           site=false; app=false; build=true
           case "$EVENT" in
-            schedule)          site="$DUE"; build="$DUE" ;;
             pull_request)      ;;
             workflow_dispatch) site=true; app="$FULL" ;;
             push)

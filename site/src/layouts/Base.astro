@@ -6,15 +6,16 @@ interface Props {
   title?: string;
   description?: string;
   slug?: string;
+  canonical?: string;
   noindex?: boolean;
 }
-const { title, description = 'Villads Claes skriver om at leve, lære, bygge og redde lidt af planeten – og du må gerne skrive med.', slug, noindex = false } = Astro.props;
+const { title, description = 'Villads Claes skriver om at leve, lære, bygge og redde lidt af planeten – og du må gerne skrive med.', slug, canonical, noindex = false } = Astro.props;
 const fullTitle = title ? `${title} · Villads Claes` : 'Villads Claes · blog';
 const path = Astro.url.pathname;
 const isHome = path === '/';
 const isTopics = path.startsWith('/emner');
 const isSites = path.startsWith('/sites');
-const isStudio = path.startsWith('/studie');
+const isStudio = path.startsWith('/admin');
 ---
 
 <!doctype html>
@@ -24,7 +25,7 @@ const isStudio = path.startsWith('/studie');
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={new URL(path, Astro.site)} />
+    <link rel="canonical" href={canonical ?? new URL(path, Astro.site)} />
     <link rel="alternate" type="application/rss+xml" title="Villads Claes · blog" href="/rss.xml" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta name="color-scheme" content="light dark" />
@@ -56,7 +57,7 @@ const isStudio = path.startsWith('/studie');
           <a href="/" aria-current={isHome ? 'page' : undefined}>Indlæg</a>
           <a href="/emner/" aria-current={isTopics ? 'page' : undefined}>Emner</a>
           <a href="/sites/" aria-current={isSites ? 'page' : undefined}>Sites</a>
-          <a href="/studie/" class="nav-write" aria-current={isStudio ? 'page' : undefined}>Skriv</a>
+          <a href="/admin/" class="nav-write" aria-current={isStudio ? 'page' : undefined}>Skriv</a>
         </nav>
 
         <button class="theme-toggle" type="button" data-theme-toggle aria-label="Skift tema" title="Skift mellem lyst og mørkt tema">
