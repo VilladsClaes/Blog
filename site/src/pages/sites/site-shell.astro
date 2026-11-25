@@ -1,0 +1,14 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+
+<Base title="__SITE_NAME__" description="Indlæg, der hører til __SITE_NAME__." noindex>
+  <header class="page-head">
+    <p class="back-link"><a href="/sites/">← Alle sites</a></p>
+    <p class="eyebrow">Site</p>
+    <h1>__SITE_NAME__</h1>
+    <p class="lede">Indlæg på bloggen, der hører til dette site.</p>
+  </header>
+
+  <div data-db-site-posts hidden></div>
+</Base>

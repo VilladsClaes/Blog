@@ -136,6 +136,21 @@
 .studio-help { margin: 0.6rem 0 0; color: var(--muted); font-size: 0.78rem; line-height: 1.5; }
 .studio-help code { font-size: 0.9em; background: var(--soft); padding: 0.05rem 0.25rem; border-radius: 3px; }
 
+.studio-recovery {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.8rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line));
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--fg);
+  font: 0.8rem/1.4 var(--sans);
+}
+.studio-recovery button { padding: 0.25rem 0.55rem; font-size: 0.74rem; }
+
 .studio-toast {
   position: fixed;
   left: 50%;

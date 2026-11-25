@@ -9,7 +9,7 @@ import Base from '../../layouts/Base.astro';
       <h1>Opslagsstudie</h1>
       <p class="lede">
         Optag video fra webcam, skriv og formgiv teksten, eller tag billeder med telefonen.
-        Alt kan udgives direkte til bloggen med din GitHub-forbindelse – eller hentes ned og lægges ind via skriveværktøjet.
+        Alt gemmes direkte i bloggens database med din admin-nøgle – og er live med det samme.
       </p>
     </header>
 
@@ -34,15 +34,15 @@ import Base from '../../layouts/Base.astro';
     <section class="studio-card">
       <div class="studio-card-head">
         <h2>Første gang</h2>
-        <p>Der skal kun opsættes én ting: en forbindelse til GitHub.</p>
+        <p>Der skal kun opsættes én ting: bloggens admin-nøgle.</p>
       </div>
       <ol class="studio-steps">
-        <li>Lav et <strong>fine-grained token</strong> på GitHub med adgang til <code>VilladsClaes/Blog</code> og rettigheden <strong>Contents: Read and write</strong>. Det er det samme token, som skriveværktøjet bruger.</li>
-        <li>Åbn en af opslagstyperne og indsæt token'et under <em>GitHub-forbindelse</em>. Det gemmes kun i din browser.</li>
-        <li>Vælg <em>Udgiv til bloggen</em>. GitHub Actions bygger og udgiver bloggen om et par minutter.</li>
+        <li>Åbn en af opslagstyperne og indsæt din <strong>admin-nøgle</strong> under <em>Admin-adgang</em>. Det er den samme nøgle som i skriveværktøjet.</li>
+        <li>Nøglen gemmes kun i denne fane og sendes til bloggens eget API – ikke til GitHub.</li>
+        <li>Vælg <em>Gem i databasen</em>. Indlægget er live med det samme, medmindre du markerer det som kladde.</li>
       </ol>
       <p class="studio-help">
-        Vil du hellere skrive i det vante CMS? Det ligger stadig på <a href="/admin/">/admin/</a>.
+        Du kan altid fortsætte med at redigere i <a href="/admin/">/admin/</a>.
         Oplæsning i din egen stemme laves med <code>npm run voice</code> – se <a href="/studie/tekst/#stemme">vejledningen under Tekst</a>.
       </p>
     </section>

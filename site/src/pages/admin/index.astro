@@ -1,0 +1,214 @@
+---
+import Base from '../../layouts/Base.astro';
+import '../../styles/admin.css';
+---
+
+<Base title="Skriv" description="Skriv og udgiv indlæg direkte til bloggens database." noindex>
+  <section class="admin-hero">
+    <p class="eyebrow">Skriveværktøj</p>
+    <h1>Skriv til bloggen</h1>
+    <p class="lede">Indlægget gemmes i bloggens egen database på webhotellet. GitHub er kun skabelonen – ikke lageret for dine tekster. <a href="/studie/">Brug opslagsstudiet til video, tekst og billeder →</a></p>
+  </section>
+
+  <div class="admin-grid">
+    <aside class="admin-side">
+      <section class="admin-card">
+        <h2>Adgang</h2>
+        <label class="admin-field">
+          <span>Admin-nøgle</span>
+          <input id="admin-key" type="password" autocomplete="current-password" placeholder="X-Admin-Key" />
+        </label>
+        <p id="key-status" class="admin-note" role="status">Indsæt nøglen fra webhotellets opsætning.</p>
+      </section>
+
+      <section class="admin-card">
+        <div class="admin-card-head">
+          <h2>Indlæg</h2>
+          <button id="new-post" class="button button-ghost admin-small-button" type="button">Nyt</button>
+        </div>
+        <ul id="post-list" class="admin-post-list">
+          <li class="admin-note">Indlæs listen med din admin-nøgle.</li>
+        </ul>
+      </section>
+
+      <section class="admin-card">
+        <h2>Papirkurv</h2>
+        <ul id="trash-list" class="admin-post-list">
+          <li class="admin-note">Slettede indlæg vises her, indtil de tømmes.</li>
+        </ul>
+        <p id="trash-status" class="admin-note" role="status"></p>
+      </section>
+
+      <section class="admin-card">
+        <div class="admin-card-head">
+          <h2>Medier</h2>
+          <button id="cleanup-media" class="button button-ghost admin-small-button" type="button">Ryd ubrugte</button>
+        </div>
+        <ul id="media-list" class="admin-post-list">
+          <li class="admin-note">Hent medieoversigten med din admin-nøgle.</li>
+        </ul>
+        <p id="media-status" class="admin-note" role="status"></p>
+      </section>
+
+      <section class="admin-card">
+        <h2>Backup og drift</h2>
+        <p id="diagnostics-status" class="admin-note" role="status">Indlæs diagnostik med din admin-nøgle.</p>
+        <div class="admin-action-buttons">
+          <button id="backup-export" class="button button-ghost admin-small-button" type="button">Hent backup</button>
+          <label class="button button-ghost admin-small-button admin-file-button">
+            Gendan backup
+            <input id="backup-file" type="file" accept=".zip,application/zip" />
+          </label>
+        </div>
+        <p id="backup-status" class="admin-note" role="status"></p>
+      </section>
+    </aside>
+
+    <form id="post-form" class="admin-form" autocomplete="off">
+      <div class="admin-actions">
+        <p id="save-status" class="admin-note" role="status">Klar til at skrive.</p>
+        <span id="post-status" class="admin-badge">ny</span>
+        <div class="admin-action-buttons">
+          <button id="copy-preview" class="button button-ghost admin-small-button" type="button" hidden>Kopiér preview-link</button>
+          <button id="delete-post" class="button button-ghost admin-small-button admin-delete-button" type="button" hidden>Slet indlæg</button>
+          <button id="save-post" class="button" type="button">Gem i databasen</button>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-fields">
+          <label class="admin-field admin-field-wide">
+            <span>Titel</span>
+            <input id="post-title" type="text" maxlength="200" required placeholder="Overskriften" />
+          </label>
+          <label class="admin-field">
+            <span>Adresse</span>
+            <input id="post-slug" type="text" maxlength="120" pattern="[a-z0-9-]+" placeholder="min-nye-tekst" />
+          </label>
+          <label class="admin-field">
+            <span>Udgivelsestidspunkt</span>
+            <input id="post-date" type="datetime-local" required />
+          </label>
+          <label class="admin-field admin-field-wide">
+            <span>Kort beskrivelse</span>
+            <textarea id="post-description" rows="2" maxlength="600" placeholder="Vises på forsiden og i søgeresultater."></textarea>
+          </label>
+          <label class="admin-field admin-field-wide">
+            <span>TLDR <em>valgfri</em></span>
+            <textarea id="post-tldr" rows="2" maxlength="1000" placeholder="To-tre linjer, som læseren kan nøjes med."></textarea>
+          </label>
+          <label class="admin-field">
+            <span>Emner <em>adskilt med komma</em></span>
+            <input id="post-tags" type="text" placeholder="tid, status, slow living" />
+          </label>
+          <label class="admin-field">
+            <span>Sites <em>adskilt med komma</em></span>
+            <input id="post-sites" type="text" placeholder="villadsclaes, longbets" />
+          </label>
+          <label class="admin-field">
+            <span>Skrifttype</span>
+            <select id="post-font">
+              <option value="serif">Serif (avisen)</option>
+              <option value="sans">Sans (skærmen)</option>
+              <option value="mono">Mono (koden)</option>
+              <option value="haandskrift">Håndskrift</option>
+            </select>
+          </label>
+          <label class="admin-field admin-check">
+            <input id="post-draft" type="checkbox" />
+            <span>Kladde – vis ikke på bloggen</span>
+          </label>
+          <label class="admin-field admin-check">
+            <input id="post-archived" type="checkbox" />
+            <span>Fra arkivet</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-card-head">
+          <h2>Forsidebillede</h2>
+          <label class="button button-ghost admin-small-button admin-file-button">
+            Vælg billede
+            <input id="cover-file" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif" />
+          </label>
+        </div>
+        <input id="post-cover" type="hidden" />
+        <p id="cover-status" class="admin-note">Billedet gemmes i databasen og kan bruges som forside.</p>
+        <img id="cover-preview" class="admin-cover-preview" alt="" hidden />
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-card-head">
+          <h2>Video og lyd</h2>
+        </div>
+        <div class="admin-fields">
+          <label class="admin-field">
+            <span>Video øverst <em>YouTube, Vimeo eller mp4</em></span>
+            <input id="post-video" type="text" placeholder="https://youtu.be/…" />
+          </label>
+          <label class="admin-field">
+            <span>Videoformat</span>
+            <select id="post-video-format">
+              <option value="">Ingen</option>
+              <option value="vandret">Vandret (16:9)</option>
+              <option value="lodret">Lodret (9:16)</option>
+            </select>
+          </label>
+          <label class="admin-field">
+            <span>Undertekster <em>.vtt</em></span>
+            <input id="post-captions" type="text" placeholder="/api/blog/media/… eller /media/…" />
+          </label>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-card-head">
+          <h2>Versioner</h2>
+        </div>
+        <ul id="revision-list" class="admin-post-list">
+          <li class="admin-note">Gem indlægget én gang for at begynde versionshistorikken.</li>
+        </ul>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-card-head">
+          <h2>Interaktive funktioner</h2>
+        </div>
+        <div class="admin-checks">
+          <label class="admin-check"><input id="feature-comments" type="checkbox" checked /> Besyv</label>
+          <label class="admin-check"><input id="feature-highlights" type="checkbox" checked /> Understregninger</label>
+          <label class="admin-check"><input id="feature-graffiti" type="checkbox" checked /> Graffiti</label>
+          <label class="admin-check"><input id="feature-read-aloud" type="checkbox" checked /> Læs op</label>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-card-head">
+          <h2>Tekst</h2>
+          <div class="admin-tools">
+            <label class="button button-ghost admin-small-button admin-file-button">
+              Indsæt billede
+              <input id="body-image-file" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif" />
+            </label>
+          </div>
+        </div>
+        <p class="admin-note">Markdown og bloggens blokke virker som i de gamle indlæg – fx <code>::spoergsmaal[…]</code>, <code>::afstemning[…]</code> og <code>::video[…]</code>.</p>
+        <div class="admin-editor-grid">
+          <label class="admin-field admin-editor-field">
+            <span>Markdown <em id="word-count">0 ord</em></span>
+            <textarea id="post-body" rows="24" placeholder="Skriv her …"></textarea>
+          </label>
+          <div class="admin-preview-wrap">
+            <span class="admin-preview-label">Forhåndsvisning</span>
+            <div id="post-preview" class="prose admin-preview"></div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</Base>
+
+<script>
+  import '../../scripts/admin/editor';
+</script>

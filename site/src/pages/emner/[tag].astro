@@ -1,26 +1,24 @@
 ---
 import Base from '../../layouts/Base.astro';
-import PostList from '../../components/PostList.astro';
-import { getPublishedPosts, tagSlug } from '../../lib/posts';
+import { topics } from '../../data/topics';
 
 export async function getStaticPaths() {
-  const posts = await getPublishedPosts();
-  const tags = [...new Set(posts.flatMap((p) => p.data.tags))];
-  return tags.map((tag) => ({
-    params: { tag: tagSlug(tag) },
-    props: { tag, posts: posts.filter((p) => p.data.tags.includes(tag)) },
+  return topics.map((topic) => ({
+    params: { tag: topic.slug },
+    props: { topic },
   }));
 }
-const { tag, posts } = Astro.props;
+
+const { topic } = Astro.props;
 ---
 
-<Base title={tag}>
+<Base title={topic.name}>
   <header class="page-head">
     <p class="back-link"><a href="/emner/">← Alle emner</a></p>
     <p class="eyebrow">Emne</p>
-    <h1>{tag}</h1>
-    <p class="lede">{posts.length} {posts.length === 1 ? 'tekst' : 'tekster'} i dette emne.</p>
+    <h1>{topic.name}</h1>
+    <p class="lede"><span data-db-topic-count hidden></span></p>
   </header>
 
-  <PostList posts={posts} />
+  <div data-db-topic-posts hidden></div>
 </Base>

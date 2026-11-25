@@ -1,0 +1,14 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+
+<Base title="__TOPIC_NAME__" description="Indlæg om __TOPIC_NAME__." noindex>
+  <header class="page-head">
+    <p class="back-link"><a href="/emner/">← Alle emner</a></p>
+    <p class="eyebrow">Emne</p>
+    <h1>__TOPIC_NAME__</h1>
+    <p class="lede"><span data-db-topic-count hidden></span></p>
+  </header>
+
+  <div data-db-topic-posts hidden></div>
+</Base>

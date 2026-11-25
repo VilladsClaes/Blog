@@ -1,0 +1,101 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="__TITLE__" description="__DESCRIPTION__" slug="__SLUG__" canonical="__CANONICAL__" noindex>
+  <div class="reading-progress" aria-hidden="true"><span data-reading-progress></span></div>
+
+  <article class="post" data-features="__FEATURES__" data-font="__FONT__">
+    <header class="post-header">
+      <div class="meta"><Fragment set:html="__META__" /></div>
+      <h1><Fragment set:html="__TITLE__" /></h1>
+      <Fragment set:html="__LEDE__" />
+      <Fragment set:html="__TAGS__" />
+      <div class="post-controls sans">
+        <button class="reading-toggle" type="button" data-reading-toggle aria-pressed="false" title="Større tekst og mere luft" hidden>
+          <span class="reading-toggle-mark" aria-hidden="true">Aa</span>
+          <span data-reading-label>Rolig læsning</span>
+        </button>
+      </div>
+    </header>
+
+    <Fragment set:html="__COVER__" />
+    <Fragment set:html="__TLDR__" />
+    <Fragment set:html="__VOICE__" />
+    <Fragment set:html="__VIDEO__" />
+
+    <div class="x-tools sans" role="toolbar" aria-label="Værktøjer til indlægget" hidden></div>
+
+    <div class="prose" id="prose">
+      <Fragment set:html="__BODY__" />
+    </div>
+
+    <Fragment set:html="__RELATED__" />
+    <Fragment set:html="__COMMENTS__" />
+
+    <footer class="post-end">
+      <p>Tak, fordi du læste med.</p>
+      <a href="#top">Til toppen ↑</a>
+    </footer>
+
+    <Fragment set:html="__NAV__" />
+  </article>
+</Base>
+
+<script>
+  import '../scripts/interactive';
+</script>
+
+<script>
+  const progress = document.querySelector<HTMLElement>('[data-reading-progress]');
+  const article = document.querySelector<HTMLElement>('article.post');
+
+  if (progress && article) {
+    let frame = 0;
+
+    const update = () => {
+      frame = 0;
+      const top = article.getBoundingClientRect().top + window.scrollY;
+      const distance = article.offsetHeight - window.innerHeight;
+      const value = distance > 0 ? (window.scrollY - top) / distance : 0;
+      progress.style.transform = `scaleX(${Math.min(1, Math.max(0, value))})`;
+    };
+
+    const request = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener('scroll', request, { passive: true });
+    window.addEventListener('resize', request);
+  }
+
+  const readingToggle = document.querySelector<HTMLButtonElement>('[data-reading-toggle]');
+
+  if (readingToggle) {
+    const label = readingToggle.querySelector<HTMLElement>('[data-reading-label]');
+    let calm = document.documentElement.dataset.reading === 'comfy';
+
+    const applyReadingMode = (on: boolean) => {
+      document.documentElement.dataset.reading = on ? 'comfy' : '';
+      readingToggle.setAttribute('aria-pressed', String(on));
+      if (label) label.textContent = on ? 'Normal visning' : 'Rolig læsning';
+    };
+
+    applyReadingMode(calm);
+    readingToggle.hidden = false;
+
+    readingToggle.addEventListener('click', () => {
+      calm = !calm;
+      applyReadingMode(calm);
+      try {
+        if (calm) localStorage.setItem('reading-mode', '1');
+        else localStorage.removeItem('reading-mode');
+      } catch {}
+    });
+  }
+</script>
+
+<style is:global>
+  @import '../styles/interactive.css';
+</style>

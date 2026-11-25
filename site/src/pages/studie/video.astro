@@ -75,6 +75,12 @@ import StudioPublish from '../../components/StudioPublish.astro';
           <label><input type="radio" name="video-format" value="16x9" /> Vandret 16:9 · YouTube</label>
         </div>
 
+        <label class="studio-check" style="grid-column:auto;margin:0.6rem 0">
+          <span>Undertekster (.vtt)</span>
+          <input id="video-captions" type="file" accept=".vtt,text/vtt" />
+        </label>
+        <p id="video-captions-status" class="studio-status" role="status">Vælg en .vtt-fil, hvis videoen skal have undertekster.</p>
+
         <div class="studio-row">
           <button type="button" id="video-export">Lav klip</button>
           <button type="button" id="video-download" class="is-secondary" disabled>Hent klippet</button>

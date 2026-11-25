@@ -35,6 +35,8 @@ const status = $('#image-status') as HTMLElement;
 
 const items: Item[] = [];
 let coverId = '';
+let existingBody = '';
+let existingCover: string | null = null;
 let cameraStream: MediaStream | null = null;
 let facing: 'environment' | 'user' = 'environment';
 let busy = false;
@@ -312,14 +314,20 @@ function fileNameFor(index: number) {
 }
 
 setupPublishPanel({
-  validate: () => (items.length ? null : 'Tag eller vælg mindst ét billede først.'),
+  load: (post) => {
+    existingBody = post.bodyMarkdown ?? '';
+    existingCover = post.cover ?? null;
+    if (!items.length) setImageStatus('Redigerer det gemte billedindlæg. Vælg nye billeder for at erstatte dem, eller gem kun tekstfelterne.', 'info');
+  },
+  validate: () => (items.length || existingBody ? null : 'Tag eller vælg mindst ét billede først.'),
   getFiles: async () =>
-    Promise.all(items.map(async (item, index) => ({
+    items.length ? Promise.all(items.map(async (item, index) => ({
       name: fileNameFor(index),
       bytes: new Uint8Array(await item.blob.arrayBuffer()),
       type: 'image/jpeg',
-    }))),
+    }))) : [],
   buildBody: (uploaded) => {
+    if (!items.length) return existingBody;
     const slug = readMeta().slug;
     return items.map((item, index) => {
       const name = fileNameFor(index);
@@ -331,6 +339,7 @@ setupPublishPanel({
     }).join('\n\n');
   },
   getExtra: (uploaded) => {
+    if (!items.length) return { cover: existingCover };
     const index = Math.max(0, items.findIndex((item) => item.id === coverId));
     const name = fileNameFor(index);
     const url = uploaded.find((media) => media.name === name)?.url

@@ -1,17 +1,15 @@
 ---
 import Base from '../../layouts/Base.astro';
-import PostList from '../../components/PostList.astro';
 import { sites } from '../../data/sites';
-import { getPublishedPosts } from '../../lib/posts';
 
 export async function getStaticPaths() {
-  const posts = await getPublishedPosts();
   return sites.map((site) => ({
     params: { site: site.key },
-    props: { site, posts: posts.filter((p) => p.data.sites.includes(site.key)) },
+    props: { site },
   }));
 }
-const { site, posts } = Astro.props;
+
+const { site } = Astro.props;
 const embed = `<script src="https://blog.villadsclaes.dk/embed.js" data-site="${site.key}" async></script>`;
 ---
 
@@ -23,7 +21,7 @@ const embed = `<script src="https://blog.villadsclaes.dk/embed.js" data-site="${
     <p class="lede">{site.description} · <a href={site.url}>{site.url.replace('https://', '')}</a></p>
   </header>
 
-  {posts.length ? <PostList posts={posts} /> : <p class="empty-state">Ingen indlæg endnu.</p>}
+  <div data-db-site-posts hidden></div>
 
   <details class="embed-box">
     <summary>Vis indlæggene på {site.name}</summary>
